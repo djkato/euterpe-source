@@ -1,0 +1,59 @@
+{
+  "name": "player-web-test",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "packages/player-web-test/src",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/vite:build",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "dist/packages/player-web-test"
+      },
+      "configurations": {
+        "development": {
+          "mode": "development"
+        },
+        "production": {
+          "mode": "production"
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/vite:dev-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "player-web-test:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "player-web-test:build:development",
+          "hmr": true
+        },
+        "production": {
+          "buildTarget": "player-web-test:build:production",
+          "hmr": false
+        }
+      }
+    },
+    "preview": {
+      "executor": "@nx/vite:preview-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "player-web-test:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "player-web-test:build:development"
+        },
+        "production": {
+          "buildTarget": "player-web-test:build:production"
+        }
+      }
+    }
+  }
+}
