@@ -13,7 +13,9 @@
         "outputPath": "dist/packages/player",
         "main": "packages/player/src/index.ts",
         "tsConfig": "packages/player/tsconfig.lib.json",
-        "assets": []
+        "assets": [
+          "packages/player/README.md"
+        ]
       }
     },
     "publish": {
@@ -33,9 +35,5 @@
         ]
       }
     }
-  },
-  "tags": [
-    "'audioContext",
-    ""
-  ]
+  }
 }

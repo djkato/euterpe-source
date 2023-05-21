@@ -17,4 +17,4 @@ Run `npx nx build player` to build the player.
 
 ## Publish
 
-First build, then `npm publish --access=public`
+First build, then run `npm run publish-[package]`(scripts)

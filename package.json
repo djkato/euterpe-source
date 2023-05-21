@@ -2,7 +2,9 @@
   "name": "@euterpe.js/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "publish-player": "cd dist/packages/player && npm publish --access=public"
+  },
   "private": false,
   "devDependencies": {
     "@nx/cypress": "16.2.1",

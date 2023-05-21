@@ -1,5 +1,25 @@
 {
   "name": "@euterpe.js/player",
-  "version": "0.0.1",
-  "type": "commonjs"
+  "version": "1.0.2",
+  "type": "commonjs",
+  "description": "A simple, safe AudioContext web music player",
+  "main": "index.ts",
+  "author": {
+    "name": "Djkáťo",
+    "email": "djkatovfx@gmail.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/euterpe-js/euterpe-source.git"
+  },
+  "homepage": "https://github.com/euterpe-js/euterpe-source#readme",
+  "keywords": [
+    "audio",
+    "player",
+    "music-player",
+    "audio-visualizer",
+    "webaudio",
+    "vizualizer"
+  ]
 }
