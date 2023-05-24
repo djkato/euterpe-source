@@ -1,5 +1,23 @@
 {
-  "name": "@euterpe/visualizer",
-  "version": "0.0.1",
-  "type": "commonjs"
+  "name": "@euterpe.js/visualizer",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "description": "Music visualizer based on SVG and AudioContext",
+  "main": "index.ts",
+  "author": {
+    "name": "Djkáťo",
+    "email": "djkatovfx@gmail.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/euterpe-js/euterpe-source.git"
+  },
+  "homepage": "https://github.com/euterpe-js/euterpe-source/tree/master/packages/visualizer#readme",
+  "keywords": [
+    "audio",
+    "audio-visualizer",
+    "webaudio",
+    "vizualizer"
+  ]
 }
