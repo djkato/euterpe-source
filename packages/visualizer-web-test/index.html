@@ -2,37 +2,37 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8" />
-  <title>VisualizerWebTest</title>
-  <base href="/" />
+	<meta charset="utf-8" />
+	<title>VisualizerWebTest</title>
+	<base href="/" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="/src/styles.css" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+	<link rel="stylesheet" href="/src/styles.css" />
 </head>
 
 <body>
-  <div class="viz-wrapper">
-    <svg id="trapnation-canvas" viewBox="0 0 500 500" preserveAspectRatio="none"></svg>
-    <svg id="bar-canvas" viewBox="0 0 500 500" preserveAspectRatio="none"></svg>
-  </div>
-  <div class="player-wrapper">
-    <audio src="" id="audio"></audio>
-    <button id="play">Play</button>
-    <button id="pause">Pause</button>
-    <button id="toggle-play">Toggle Pause/Play</button>
-    <p id="current">-:--</p>
-    <input type="range" min="0" max="10" value="0" id="seek" step="0.01">
-    <p id="duration">-:--</p>
-    <span>
-      <input type="range" min="0" max="1" value="1" id="volume" step="0.01">
-    </span>
-    <button id="mute">Mute</button>
-    <button id="unmute">Unmute</button>
-    <button id="toggle-mute">Toggle Mute</button>
+	<div class="viz-wrapper">
+		<svg id="trapnation-canvas" viewBox="0 0 500 500" preserveAspectRatio="none"></svg>
+		<svg id="bar-canvas" viewBox="0 0 500 500" preserveAspectRatio="none"></svg>
+	</div>
+	<div class="player-wrapper">
+		<audio src="" id="audio"></audio>
+		<button id="play">Play</button>
+		<button id="pause">Pause</button>
+		<button id="toggle-play">Toggle Pause/Play</button>
+		<p id="current">-:--</p>
+		<input type="range" min="0" max="10" value="0" id="seek" step="0.01">
+		<p id="duration">-:--</p>
+		<span>
+			<input type="range" min="0" max="1" value="1" id="volume" step="0.01">
+		</span>
+		<button id="mute">Mute</button>
+		<button id="unmute">Unmute</button>
+		<button id="toggle-mute">Toggle Mute</button>
 
-  </div>
-  <script type="module" src="/src/main.ts"></script>
+	</div>
+	<script type="module" src="/src/main.ts"></script>
 </body>
 
 </html>

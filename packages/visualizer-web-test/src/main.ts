@@ -1,34 +1,37 @@
 import { MusicPlayerBuilder } from "@euterpe/player";
-import { AudioVisualBuilder, SmoothingAlgorythm, ShapeType } from "@euterpe/visualizer";
+import { AudioVisualBuilder, SmoothingAlgorythm, ShapeType } from "@euterpe/visualizer"
 const audio_el = document.querySelector("#audio") as HTMLAudioElement
 const music_player_builder = MusicPlayerBuilder(audio_el)
 music_player_builder.start()
-const analyser_node = music_player_builder.add_analyser()
+const trapnation_analyser_node = music_player_builder.add_analyser()
+const bar_analyser_node = music_player_builder.add_analyser()
 const music_player = music_player_builder.build()
 music_player.change_volume(1)
 
-
-
-const trapnation_visual_builder = AudioVisualBuilder(analyser_node, document.querySelector("#trapnation-canvas") as SVGSVGElement)
-trapnation_visual_builder.start()
-trapnation_visual_builder.set_fft_size(8192)
-trapnation_visual_builder.set_fft_data_tresholds({ to_fft_range_i: 3, point_count_i: 50, fft_multiplier_i: 1, fft_offset_i: -80 })
-trapnation_visual_builder.set_fft_time_smoothing(0.6)
-//If not using typescript enums, CatmullRom = number 2
-trapnation_visual_builder.set_smoothing_algorythm(SmoothingAlgorythm.CatmullRom)
+/**
+ * Create the Audio Visualizer
+ */
+const trapnation_visual_builder = new AudioVisualBuilder(trapnation_analyser_node, document.querySelector("#trapnation-canvas") as SVGSVGElement)
+    //Because the to_fft_range is so low, it needs more FFT data.
+    .set_fft_size(8192)
+    //Tells the Visualiser how to parse data which mutates our initial shape
+    .set_fft_data_tresholds({ to_fft_range_i: 3, point_count_i: 40, fft_multiplier_i: 1.5, fft_offset_i: 150 })
+    .set_fft_time_smoothing(0.6)
+    //If not using typescript enums, CatmullRom = number 2
+    .set_smoothing_algorythm(SmoothingAlgorythm.CatmullRom)
 const trapnation_visual = trapnation_visual_builder.build(ShapeType.Circle)
 
-const bar_visual_builder = AudioVisualBuilder(analyser_node, document.querySelector("#bar-canvas") as SVGSVGElement)
-bar_visual_builder.start()
-bar_visual_builder.set_fft_data_tresholds({ to_fft_range_i: 10, point_count_i: 10, fft_multiplier_i: 1.5, fft_offset_i: 50 })
-bar_visual_builder.set_fft_time_smoothing(0.8)
-//If not using typescript enums, CatmullRom = number 2
-bar_visual_builder.set_smoothing_algorythm(SmoothingAlgorythm.Linear)
-const bar_visual = trapnation_visual_builder.build(ShapeType.Line)
+const bar_visual_builder = new AudioVisualBuilder(bar_analyser_node, document.querySelector("#bar-canvas") as SVGSVGElement)
+    .set_fft_data_tresholds({ point_count_i: 50, fft_multiplier_i: 3, fft_offset_i: -30 })
+    .set_fft_time_smoothing(0.8)
+    .set_smoothing_algorythm(SmoothingAlgorythm.BezierPerpendicular)
+const bar_visual = bar_visual_builder.build(ShapeType.Line)
 
 
 trapnation_visual.draw()
 bar_visual.draw()
+
+
 /*
  * The player part
  */
