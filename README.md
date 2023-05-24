@@ -10,10 +10,12 @@ All programs go like this: `npx nx {package script} {package}`
 ## Test this workspace
 
 Run `npx nx server player-web-test` to see the music player in a minimal demo.
+Run `npx nx server visualizer-web-test` to see the music player in a minimal demo.
 
 ## Build
 
 Run `npx nx build player` to build the player.
+Run `npx nx build visualizer` to build the player.
 
 ## Publish
 

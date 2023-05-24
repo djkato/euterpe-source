@@ -1,0 +1,30 @@
+#volume{
+   transform: rotate(270deg);
+}
+body {
+    width: 100vw;
+    height:100vh;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.player-wrapper{
+    width:50vw;
+    display: flex;
+    justify-content: space-between;
+}
+.viz-wrapper{
+    width:50vw;
+    display: flex;
+    justify-content: space-between;
+}
+#trapnation-canvas{
+    width:100%;
+    fill: grey;
+    stroke: black;
+}
+.wrapper div{
+    width:100%;
+}
