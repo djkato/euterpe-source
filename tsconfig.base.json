@@ -18,6 +18,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@euterpe-js/music-library": [
+        "packages/music-library/src/index.ts"
+      ],
       "@euterpe/player": [
         "packages/player/src/index.ts"
       ],

@@ -1,0 +1,40 @@
+{
+  "name": "music-library",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/music-library/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "outputPath": "dist/packages/music-library",
+        "main": "packages/music-library/src/index.ts",
+        "tsConfig": "packages/music-library/tsconfig.lib.json",
+        "assets": [
+          "packages/music-library/*.md"
+        ]
+      }
+    },
+    "publish": {
+      "command": "node tools/scripts/publish.mjs music-library {args.ver} {args.tag}",
+      "dependsOn": [
+        "build"
+      ]
+    },
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": [
+        "{options.outputFile}"
+      ],
+      "options": {
+        "lintFilePatterns": [
+          "packages/music-library/**/*.ts"
+        ]
+      }
+    }
+  },
+  "tags": []
+}

@@ -1,0 +1,53 @@
+{
+    "artist": {
+        "id": 0,
+        "name": "",
+        "pfp?": "url('')",
+        "songs?": [
+            "ref(songs,0)",
+            "ref(songs,2)"
+        ],
+        "collections?": [
+            "ref(collections,0)"
+        ],
+        "links?": [
+            "(youtube, url(''))",
+            "(key, url(''))"
+        ]
+    },
+    "song": {
+        "id": 0,
+        "publish-date?": "00-00-0000",
+        "name": "",
+        "artists": [
+            "ref(artists, 0)",
+            "ref(artists, 1)"
+        ],
+        "remix_artists": [
+            "ref(artists,3)"
+        ],
+        "in_collection?": "ref(collections,0)",
+        "url": "url('')",
+        "cover?": "either url or use collections cover",
+        "duration": 123,
+        "bpm?": 120,
+        "key": "A Minor",
+        "fft_data?": [
+            0,
+            1
+        ]
+    },
+    "collection": {
+        "id": 0,
+        "publish-date?": "00-00-0000",
+        "artists": [
+            "ref(artists, 0)"
+        ],
+        "songs": [
+            "ref(songs, 1)",
+            "ref(songs, 2)"
+        ],
+        "cover": "url('')",
+        "duration": 123
+    }
+}

@@ -1,25 +1,32 @@
 {
-  "name": "@euterpe.js/player",
-  "version": "1.0.21",
-  "type": "commonjs",
-  "description": "A simple, safe AudioContext web music player",
-  "main": "index.ts",
-  "author": {
-    "name": "Djkáťo",
-    "email": "djkatovfx@gmail.com"
-  },
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/euterpe-js/euterpe-source.git"
-  },
-  "homepage": "https://github.com/euterpe-js/euterpe-source/tree/master/packages/player#readme",
-  "keywords": [
-    "audio",
-    "player",
-    "music-player",
-    "audio-visualizer",
-    "webaudio",
-    "vizualizer"
-  ]
+	"name": "@euterpe.js/player",
+	"version": "1.0.22",
+	"type": "module",
+	"description": "A simple, safe AudioContext web music player",
+	"main": "./src/index.js",
+	"author": {
+		"name": "Djkáťo",
+		"email": "djkatovfx@gmail.com"
+	},
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/euterpe-js/euterpe-source.git"
+	},
+	"homepage": "https://github.com/euterpe-js/euterpe-source/tree/master/packages/player#readme",
+	"keywords": [
+		"audio",
+		"player",
+		"music-player",
+		"audio-visualizer",
+		"webaudio",
+		"vizualizer"
+	],
+	"exports": {
+		".": {
+			"types": "./src/index.d.ts",
+			"import": "./src/index.js",
+			"require": "./src/lib/player.js"
+		}
+	}
 }
