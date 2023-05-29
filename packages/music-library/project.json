@@ -34,6 +34,12 @@
           "packages/music-library/**/*.ts"
         ]
       }
+    },
+    "run": {
+      "dependsOn": [
+        "build"
+      ],
+      "command": "node ./dist/packages/music-library/src/index.js"
     }
   },
   "tags": []

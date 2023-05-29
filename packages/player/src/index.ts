@@ -292,7 +292,7 @@ export const MusicPlayer = (audio_context_i: AudioContext, audio_element_i: HTML
                 controller.abort()
                 reject(e)
             }, { signal: controller.signal })
-
+            /*
             audio_element.addEventListener("abort", function abort_listener(e) {
                 controller.abort()
                 reject(e)
@@ -302,6 +302,7 @@ export const MusicPlayer = (audio_context_i: AudioContext, audio_element_i: HTML
                 controller.abort()
                 reject(e)
             }, { signal: controller.signal })
+            */
             is_playing = false
         })
     }
