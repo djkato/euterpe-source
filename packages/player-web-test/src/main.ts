@@ -1,7 +1,6 @@
-import { MusicPlayerBuilder } from "@euterpe/player";
+import { MusicPlayerBuilder } from "@euterpe.js/player";
 const audio_el = document.querySelector("#audio") as HTMLAudioElement
-const music_player_builder = MusicPlayerBuilder(audio_el)
-music_player_builder.start()
+const music_player_builder = new MusicPlayerBuilder(audio_el)
 const music_player = music_player_builder.build()
 music_player.change_volume(1)
 

@@ -37,6 +37,7 @@ export class AudioVisual {
     #canvas_height
     #canvas_width
     #fft_data
+    #subscriber_fns = new Array<(data: Float32Array) => void>()
     constructor(
         analyzer_node: AnalyserNode,
         svg_injecting_element: SVGSVGElement,
@@ -256,9 +257,14 @@ export class AudioVisual {
         return `<path width="100%" height="100%" d="${path}"/>`
     }
 
+    on_data(fn: ((data: Float32Array) => void)) {
+        this.#subscriber_fns.push(fn)
+    }
+
     draw() {
         this.#analyzer_node.getFloatFrequencyData(this.#fft_data)
         this.#svg_injecting_element.innerHTML = this.#create_svg_element()
+        this.#subscriber_fns.forEach((fn) => fn(this.#fft_data))
         requestAnimationFrame(this.draw.bind(this))
     }
 }

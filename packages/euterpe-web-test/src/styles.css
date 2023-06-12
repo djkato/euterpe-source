@@ -1,0 +1,38 @@
+#volume{
+   transform: rotate(270deg);
+}
+body {
+    width: 100vw;
+    height:100vh;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.wrapper{
+    width:80vw;
+    display: flex;
+    justify-content: space-between;
+}
+.name-wrapper{
+    width:80vw;
+    display: flex;
+    justify-content: center;
+}
+.library-wrapper > div {
+    display: flex;
+    margin: 0 5rem;
+    justify-content: space-between;
+}
+.library-wrapper {
+    width:60vw;
+}
+.library-wrapper button {
+    height: 100%;
+}
+.dev-wrapper{
+    width: 80vw;
+    margin: 6rem 0;
+}

@@ -55,19 +55,19 @@ document.querySelector("#volume")?.addEventListener("input", (e) => {
 Euterpe Player also provides functions to easily track the status of playback. It does this via Subscription/Publisher pattern which publishes every frame ( Using `requestAnimationFrame()`). This allows for always up todate values reflecting on the UI.
 ```js
 // Subscriptions to AudioContext changes, eg. time..
-music_player.subscribe_to_formatted_duration_time((time) => {
+music_player.on_duration_formatted((time) => {
     //time == "4:53, "15:59", "1756:15:59"...
     document.querySelector("#duration-text").innerHTML = time
     //duration but in "0","1.2", "1223.21668181"... format
     document.querySelector("#input-seek-range").max = "" + music_player.get_current_duration()
 })
 //Keep the current time uptodate but formatted.
-music_player.subscribe_to_formatted_current_time_tick((time) => {
+music_player.on_time_tick_formatted((time) => {
     //time == "2:52", "10:59:59"...
     document.querySelector("#current-text").innerHTML = time
 })
 //Keep <input type="range"..> slider uptodate
-music_player.subscribe_to_time_tick((time) => {
+music_player.on_time_tick((time) => {
     //time == "0","1.2", "1223.21668181"...
     document.querySelector("#input-seek-range").value = "" + time
 })

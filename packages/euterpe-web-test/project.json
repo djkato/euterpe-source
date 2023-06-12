@@ -1,0 +1,70 @@
+{
+  "name": "euterpe-web-test",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "packages/euterpe-web-test/src",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/vite:build",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "dist/packages/euterpe-web-test"
+      },
+      "configurations": {
+        "development": {
+          "mode": "development"
+        },
+        "production": {
+          "mode": "production"
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/vite:dev-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "euterpe-web-test:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "euterpe-web-test:build:development",
+          "hmr": true
+        },
+        "production": {
+          "buildTarget": "euterpe-web-test:build:production",
+          "hmr": false
+        }
+      }
+    },
+    "preview": {
+      "executor": "@nx/vite:preview-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "euterpe-web-test:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "euterpe-web-test:build:development"
+        },
+        "production": {
+          "buildTarget": "euterpe-web-test:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": [
+        "{options.outputFile}"
+      ],
+      "options": {
+        "lintFilePatterns": [
+          "packages/euterpe-web-test/**/*.ts"
+        ]
+      }
+    }
+  }
+}

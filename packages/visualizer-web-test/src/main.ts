@@ -1,8 +1,7 @@
-import { MusicPlayerBuilder } from "@euterpe/player";
-import { AudioVisualBuilder, SmoothingAlgorythm, ShapeType } from "@euterpe/visualizer"
+import { MusicPlayerBuilder } from "@euterpe.js/player";
+import { AudioVisualBuilder, SmoothingAlgorythm, ShapeType } from "@euterpe.js/visualizer"
 const audio_el = document.querySelector("#audio") as HTMLAudioElement
-const music_player_builder = MusicPlayerBuilder(audio_el)
-music_player_builder.start()
+const music_player_builder = new MusicPlayerBuilder(audio_el)
 const trapnation_analyser_node = music_player_builder.add_analyser()
 const bar_analyser_node = music_player_builder.add_analyser()
 const music_player = music_player_builder.build()
@@ -70,14 +69,14 @@ music_player.try_new_song_async(encodeURI("http://127.0.0.1:4200/nuphory - NVISI
             is_seeking = false
         })
         // Subscriptions to AudioContext changes, eg. time..
-        music_player.subscribe_to_formatted_duration_time((time) => {
+        music_player.on_duration_formatted((time) => {
             document.querySelector("#duration").innerHTML = time
-            document.querySelector("#seek").max = "" + music_player.get_current_duration()
+            document.querySelector("#seek").max = "" + music_player.current_song_duration
         })
-        music_player.subscribe_to_formatted_current_time_tick((time) => {
+        music_player.on_time_tick_formatted((time) => {
             document.querySelector("#current").innerHTML = time
         })
-        music_player.subscribe_to_time_tick((time) => {
+        music_player.on_time_tick((time) => {
             if (is_seeking) return
             document.querySelector("#seek").value = "" + time
         })

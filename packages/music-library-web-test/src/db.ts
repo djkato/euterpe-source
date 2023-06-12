@@ -1,4 +1,4 @@
-import { DB, Artist, Song, RefTo, Ref, Platforms } from "@euterpe/music-library";
+import { DB, Artist, Song, RefTo, Ref, Platforms } from "@euterpe.js/music-library";
 export const db = new DB
 
 db.add([

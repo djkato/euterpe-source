@@ -18,13 +18,16 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@euterpe/music-library": [
+      "@euterpe.js/euterpe": [
+        "packages/euterpe/src/index.ts"
+      ],
+      "@euterpe.js/music-library": [
         "packages/music-library/src/index.ts"
       ],
-      "@euterpe/player": [
+      "@euterpe.js/player": [
         "packages/player/src/index.ts"
       ],
-      "@euterpe/visualizer": [
+      "@euterpe.js/visualizer": [
         "packages/visualizer/src/index.ts"
       ]
     }

@@ -5,7 +5,8 @@
   "scripts": {
     "publish-player": "nx build player && cd dist/packages/player && npm publish --access=public",
     "publish-visualizer": "nx build visualizer && cd dist/packages/visualizer && npm publish --access=public",
-    "publish-library": "nx build music-library && cd dist/packages/music-library && npm publish --access=public"
+    "publish-library": "nx build music-library && cd dist/packages/music-library && npm publish --access=public",
+    "publish-euterpe": "nx build euterpe && cd dist/packages/euterpe && npm publish --access=public"
   },
   "private": false,
   "devDependencies": {
