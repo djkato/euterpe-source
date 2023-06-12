@@ -1,6 +1,6 @@
 {
   "name": "@euterpe.js/music-library",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "description": "A simple music library, acting as a Local DB as JS Object. Contains everything a person would need to store their music data for website playback.",
   "main": "./src/index.js",
