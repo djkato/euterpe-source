@@ -205,6 +205,9 @@ class DB {
                 }
             }
         }
+        this.songs.sort((a, b) => a.id! - b.id!)
+        this.collections.sort((a, b) => a.id! - b.id!)
+        this.artists.sort((a, b) => a.id! - b.id!)
     }
 }
 // const db = new DB

@@ -49,7 +49,6 @@ class Euterpe extends Player.MusicPlayer {
                 new_song = this.queue.shift()!
             } else {
                 let id_i = this.db.songs.length;
-                this.db.songs.sort((a, b) => a.id! - b.id!)
                 while (this.db.songs[--id_i].id! > this.current_song_id);
                 const next_id = ++id_i;
 
@@ -81,7 +80,6 @@ class Euterpe extends Player.MusicPlayer {
                 new_song = this.queue.shift()!
             } else {
                 let id_i = this.db.songs.length;
-                this.db.songs.sort((a, b) => a.id! - b.id!)
                 while (this.db.songs[--id_i].id! > this.current_song_id);
                 let next_id = ++id_i
 
@@ -111,7 +109,6 @@ class Euterpe extends Player.MusicPlayer {
             new_song = this.queue.shift()!
         } else {
             let id_i = this.db.songs.length;
-            this.db.songs.sort((a, b) => a.id! - b.id!)
             while (this.db.songs[--id_i].id! > this.current_song_id);
             let next_id = ++id_i;
 
@@ -134,7 +131,6 @@ class Euterpe extends Player.MusicPlayer {
             new_song = this.queue.shift()!
         } else {
             let id_i = this.db.songs.length;
-            this.db.songs.sort((a, b) => a.id! - b.id!)
             while (this.db.songs[--id_i].id! > this.current_song_id);
             const next_id = ++id_i;
             if (next_id == this.db.songs.length) throw new Error("Won't go past the last song")
@@ -215,7 +211,6 @@ class Euterpe extends Player.MusicPlayer {
                 new_song = this.played_history.pop()!
             } else {
                 let id_i = 0;
-                this.db.songs.sort((a, b) => a.id! - b.id!)
                 while (this.db.songs[++id_i].id! < this.current_song_id);
                 const next_id = --id_i;
 
@@ -247,7 +242,6 @@ class Euterpe extends Player.MusicPlayer {
                 new_song = this.played_history.pop()!
             } else {
                 let id_i = -1;
-                this.db.songs.sort((a, b) => a.id! - b.id!)
                 while (this.db.songs[++id_i].id! < this.current_song_id);
                 let next_id = --id_i;
 
@@ -277,7 +271,6 @@ class Euterpe extends Player.MusicPlayer {
             new_song = this.played_history.pop()!
         } else {
             let id_i = 0;
-            this.db.songs.sort((a, b) => a.id! - b.id!)
             while (this.db.songs[++id_i].id! < this.current_song_id);
             const next_id = -id_i;
 
@@ -300,7 +293,6 @@ class Euterpe extends Player.MusicPlayer {
             new_song = this.played_history.pop()!
         } else {
             let id_i = 0;
-            this.db.songs.sort((a, b) => a.id! - b.id!)
             while (this.db.songs[++id_i].id! < this.current_song_id);
             let next_id = -id_i;
 
