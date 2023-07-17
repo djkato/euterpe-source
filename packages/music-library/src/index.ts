@@ -5,13 +5,21 @@ export {
     Collection,
     DB,
     Artist,
-    Platforms
+    Platforms,
+    CollectionType
 }
 type ID = number
 enum RefTo {
     Artists,
     Songs,
     Collections
+}
+enum CollectionType {
+    Album = "Album",
+    EP = "EP",
+    Single = "Single",
+    Playlist = "Playlist",
+    Release = "Release",
 }
 enum Platforms {
     Youtube = "Youtube",
@@ -55,7 +63,8 @@ interface SongConstructor {
     bpm?: number
     key?: string
     fft_data?: number[]
-    id?: ID
+    id?: ID,
+    metadata: any
 }
 class Song {
     name: string
@@ -69,6 +78,7 @@ class Song {
     bpm?: number
     key?: string
     fft_data?: number[]
+    metadata: any
     /**
     * The ID is always there, don't worry :)
     */
@@ -86,6 +96,7 @@ class Song {
         this.key = data.key
         this.fft_data = data.fft_data
         this.id = data.id
+        this.metadata = data.metadata
     }
 }
 
@@ -96,6 +107,7 @@ interface ArtistConstructor {
     collections?: Ref[]
     links?: [Platforms, URL][]
     id?: ID
+    metadata: any
 }
 class Artist {
     name = ""
@@ -103,6 +115,7 @@ class Artist {
     songs: Ref[]
     collections: Ref[]
     links?: [Platforms, URL][]
+    metadata: any
     /**
  * The ID is always there, don't worry :)
  */
@@ -114,6 +127,7 @@ class Artist {
         this.collections = data.collections || []
         this.links = data.links
         this.id = data.id
+        this.metadata = data.metadata
     }
 }
 interface CollectionConstructor {
@@ -123,13 +137,20 @@ interface CollectionConstructor {
     duration: number
     publish_date?: Date
     id?: ID
+    metadata: any
+    name?: string
+    type?: CollectionType
+
 }
 class Collection {
+    name?: string
+    type?: CollectionType
     artists: Ref[]
     songs: Ref[]
     cover: URL
     duration: number
     publish_date?: Date
+    metadata: any
     /**
      * The ID is always there, don't worry :)
      */
@@ -141,6 +162,8 @@ class Collection {
         this.duration = data.duration
         this.publish_date = data.publish_date
         this.id = data.id
+        this.name = data.name
+        this.metadata = data.metadata
     }
 }
 class DB {
@@ -157,7 +180,13 @@ class DB {
          *  eg. adding song with refrence to artist, adds refrence of song to artist
          * and adds incremental ids
          */
-        for (const input of stuff) {
+        let inputs
+        if (typeof stuff[Symbol.iterator] != "function") {
+            inputs = [stuff]
+        } else {
+            inputs = stuff
+        }
+        for (const input of inputs) {
             if (input instanceof Artist) {
                 const artist = input as Artist
                 if (!artist.id) artist.id = this.artists.length

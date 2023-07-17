@@ -1,8 +1,7 @@
 import * as Player from "@euterpe.js/player"
 import * as Library from "@euterpe.js/music-library"
-import * as Visualizer from "@euterpe.js/visualizer"
 
-export { Player, Library, Visualizer, Euterpe, EuterpeBuilder }
+export { Euterpe, EuterpeBuilder }
 /**
  * Avoid Writing directly to any fields in this class!
  */
