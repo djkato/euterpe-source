@@ -1,6 +1,6 @@
 # Visualizer
-
-Euterpe Visualizer is a unique audio visual library for the web. Using SVG elements instead of canvas, it allows to leverage the power of GPU to do the actual drawing.
+![example](https://cdn.discordapp.com/attachments/1108067171122282641/1130983369619026050/firefox_krQG16y1rS.gif)
+Euterpe Visualizer is a unique audio visual library for the web. Using SVG elements instead of canvas, it allows to leverage the power of GPU to do the actual drawing, unlike canvas, which is purely cpu.
 
 ### How to use
 
