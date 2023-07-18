@@ -1,6 +1,6 @@
 {
 	"name": "@euterpe.js/visualizer",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"type": "module",
 	"description": "Music visualizer based on SVG and AudioContext",
 	"main": "./src/index.js",

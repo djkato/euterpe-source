@@ -1,22 +1,23 @@
 #volume{
-   transform: rotate(270deg);
+    transform: rotate(270deg);
+}
+:root {
+    --clip-time-path: polygon("0 0, 0 0, 0 100%, 0 100%");
+    --clip-seek-path: polygon("0 0, 0 0, 0 100%, 0 100%");
 }
 body {
-    width: 100vw;
-    height:100vh;
+    height:100%;
+    padding: 10vh;
     margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 .player-wrapper{
-    width:50vw;
+    width:100%;
     display: flex;
     justify-content: space-between;
+    margin-top:10vh;
 }
 .viz-wrapper{
-    width:50vw;
+    width:100%;
     display: flex;
     justify-content: space-between;
 }
@@ -27,4 +28,12 @@ body {
 }
 .wrapper div{
     width:100%;
+}
+.waveform-time {
+    clip-path: var(--clip-time-path);
+    fill: rgba(50,145,200,0.3);
+}
+.waveform-seek {
+    clip-path: var(--clip-seek-path);
+    fill: rgba(50,145,200,0.3);
 }

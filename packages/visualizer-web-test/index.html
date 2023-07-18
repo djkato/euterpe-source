@@ -15,6 +15,16 @@
 	<div class="viz-wrapper">
 		<svg id="trapnation-canvas" viewBox="0 0 500 500" preserveAspectRatio="none"></svg>
 		<svg id="bar-canvas" viewBox="0 0 500 500" preserveAspectRatio="none"></svg>
+		<svg id="waveform-canvas" viewBox="0 0 500 500" preserveAspectRatio="none">
+			<clipPath id="clip-seek">
+				<rect id="clip-seek-rect" width="500" height="500" />
+			</clipPath>
+			<clipPath id="clip-time">
+				<rect id="clip-time-rect" width="500" height="500" />
+			</clipPath>
+			<use clip-path="url(#clip-seek)" href="#waveform-seek" />
+			<use clip-path="url(#clip-time)" href="#waveform-time" />
+		</svg>
 	</div>
 	<div class="player-wrapper">
 		<audio src="" id="audio"></audio>

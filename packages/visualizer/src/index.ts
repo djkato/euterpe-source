@@ -7,11 +7,24 @@ export enum SmoothingAlgorythm {
 export enum ShapeType {
     Circle,
     Line,
+    Waveform,
     /*To be Implmeneted
     Custom,
-    Waveform,
     FullSongWaveForm
     */
+}
+export enum WaveformOrientation {
+    Vertical,
+    Horizontal,
+}
+export enum WaveformShape {
+    LineLike,
+    Striped,
+}
+export type WaveformOptions = {
+    fft_data: Float32Array,
+    shape_type: WaveformShape,
+    orientation: WaveformOrientation
 }
 type Point = {
     x: number,
@@ -22,6 +35,8 @@ type Shape = {
     //Algo-rythm, because this is about music. Get it? xd
     smoothing_algorythm: SmoothingAlgorythm
     points: Point[]
+    waveform_options?: WaveformOptions
+    symmetry?: boolean
 }
 
 export class AudioVisual {
@@ -59,14 +74,20 @@ export class AudioVisual {
         this.#to_fft_range = to_fft_range
         this.#point_count = point_count
 
-        this.#fft_data = new Float32Array()
+        this.#fft_data = new Float32Array(this.#analyzer_node.frequencyBinCount)
         this.#canvas_width = svg_injecting_element.viewBox.baseVal.width
         this.#canvas_height = svg_injecting_element.viewBox.baseVal.height
     }
 
-    #get_cured_frequency_data() {
-        this.#fft_data = new Float32Array(this.#buffer_length)
-        this.#analyzer_node.getFloatFrequencyData(this.#fft_data)
+    #get_cured_frequency_data(): Array<number> {
+        let buffer_length_cache
+        if (this.#shape.shape_type == ShapeType.Waveform) {
+            this.#fft_data = this.#shape.waveform_options!.fft_data
+            buffer_length_cache = this.#buffer_length
+            this.#buffer_length = this.#fft_data.length
+        } else {
+            this.#analyzer_node.getFloatFrequencyData(this.#fft_data)
+        }
         const from = Math.round((this.#point_count / 100) * this.#from_fft_range)
         const to = Math.round(this.#buffer_length - (this.#buffer_length / 100) * this.#to_fft_range)
         const squeeze_factor = Math.round((this.#buffer_length - to) / this.#point_count)
@@ -127,8 +148,7 @@ export class AudioVisual {
     #catmull_rom_smooth(arr: { x: number, y: number }[], k: number) {
         if (k == null) k = 1
         const last = arr.length - 2
-
-        let path = "M" + [arr[0].x, arr[0].y]
+        let path = ""
 
         for (let i = 0; i < arr.length - 1; i++) {
 
@@ -159,7 +179,6 @@ export class AudioVisual {
 
             path += "C" + [cp1x, cp1y, cp2x, cp2y, x2, y2]
         }
-        path += " Z"
         return path
     }
 
@@ -171,9 +190,10 @@ export class AudioVisual {
         switch (this.#shape.shape_type) {
             case ShapeType.Line: {
                 for (let i = 0; i < frequency_data.length - 1; i++) {
+                    const mutator = isFinite(frequency_data[i]) ? this.#convert_range(frequency_data[i] * this.#fft_multiplier + this.#fft_offset, in_range, out_range) : -1 * this.#canvas_height
                     mutated_points.push({
                         x: this.#shape.points[i].x /** ((Math.max(FFTDataArray[i] + 100)) * 4)*/,
-                        y: this.#shape.points[i].y - this.#convert_range(frequency_data[i] * this.#fft_multiplier + this.#fft_offset, in_range, out_range),
+                        y: this.#shape.points[i].y - mutator,
                     })
                 }
                 break
@@ -190,6 +210,50 @@ export class AudioVisual {
                     */
                 }
 
+                break
+            }
+            case ShapeType.Waveform: {
+                if (this.#shape.waveform_options!.shape_type == WaveformShape.LineLike) {
+                    if (this.#shape.symmetry) {
+                        for (let i = 0; i < this.#shape.points.length - 1; i += 2) {
+                            const mutator = this.#convert_range(frequency_data[i / 2] * this.#fft_multiplier + this.#fft_offset, in_range, out_range)
+                            if (this.#shape.waveform_options!.orientation == WaveformOrientation.Horizontal) {
+                                mutated_points.push({
+                                    x: this.#shape.points[i].x,
+                                    y: this.#shape.points[i].y - mutator
+                                })
+                                mutated_points.push({
+                                    x: this.#shape.points[i + 1].x,
+                                    y: this.#shape.points[i + 1].y + mutator
+                                })
+                            } else {
+                                mutated_points.push({
+                                    x: this.#shape.points[i].x + mutator,
+                                    y: this.#shape.points[i].y
+                                })
+                                mutated_points.push({
+                                    x: this.#shape.points[i + 1].x - mutator,
+                                    y: this.#shape.points[i + 1].y
+                                })
+                            }
+                        }
+                    } else {
+                        for (let i = 0; i < frequency_data.length - 1; i++) {
+                            const mutator = this.#convert_range(frequency_data[i] * this.#fft_multiplier + this.#fft_offset, in_range, out_range)
+                            if (this.#shape.waveform_options!.orientation == WaveformOrientation.Horizontal) {
+                                mutated_points.push({
+                                    x: this.#shape.points[i].x,
+                                    y: this.#shape.points[i].y - mutator
+                                })
+                            } else {
+                                mutated_points.push({
+                                    x: this.#shape.points[i].x - mutator,
+                                    y: this.#shape.points[i].y
+                                })
+                            }
+                        }
+                    }
+                }
                 break
             }
         }
@@ -211,16 +275,40 @@ export class AudioVisual {
             }
             case ShapeType.Circle: {
                 path = `M ${arr[0].x} ${arr[0].y} `
+                break
+            }
+            case ShapeType.Waveform: {
+                path = `M ${0} ${this.#canvas_height / 2}`
+                break
             }
         }
         switch (this.#shape.smoothing_algorythm) {
             case SmoothingAlgorythm.Linear: {
-                for (let i = 0; i < arr.length; i++) {
-                    path += `L ${arr[i].x},${arr[i].y} `
-                }
-                if (this.#shape.shape_type == ShapeType.Line) {
-                    path += `L ${this.#canvas_width} ${this.#canvas_height / 2} `
-                    //path += `L ${canvas_width} ${canvas_height} `
+                switch (this.#shape.shape_type) {
+                    case ShapeType.Line: {
+                        for (let i = 0; i < arr.length; i++) {
+                            path += `L ${arr[i].x},${arr[i].y} `
+                        }
+                        if (this.#shape.shape_type == ShapeType.Line) {
+                            path += `L ${this.#canvas_width} ${this.#canvas_height} `
+                            //path += `L ${canvas_width} ${canvas_height} `
+                        }
+                        break
+                    }
+                    case ShapeType.Circle: {
+                        for (let i = 0; i < arr.length; i++) {
+                            path += `L ${arr[i].x},${arr[i].y} `
+                        }
+                        break
+                    }
+                    case ShapeType.Waveform: {
+                        for (let i = 0; i < arr.length; i += 2) {
+                            path += `L ${arr[i].x},${arr[i].y} `
+                        }
+                        for (let i = arr.length - 1; i >= 0; i -= 2) {
+                            path += `L ${arr[i].x},${arr[i].y} `
+                        }
+                    }
                 }
                 path += `Z `
                 break
@@ -250,7 +338,28 @@ export class AudioVisual {
                 break
             }
             case SmoothingAlgorythm.CatmullRom: {
-                path = this.#catmull_rom_smooth(arr, 1)
+                if (this.#shape.shape_type == ShapeType.Waveform && this.#shape.symmetry == true) {
+                    //adding points so both halfs ends and start at the same center point
+                    const first_half = [{ x: 0, y: this.#canvas_height / 2 }]
+                    const second_half = [{ x: 0, y: this.#canvas_height / 2 }]
+                    for (let i = 0; i < arr.length - 1; i += 2) {
+                        first_half.push(arr[i])
+                        second_half.push(arr[i + 1])
+                    }
+                    first_half.push({ x: this.#canvas_width, y: this.#canvas_height / 2 })
+                    second_half.push({ x: this.#canvas_width, y: this.#canvas_height / 2 })
+                    // path += `M ${this.#canvas_width},${this.#canvas_height / 2}`
+                    second_half.reverse()
+                    //path += ` L 0 ${this.#canvas_height / 2}`
+                    path += this.#catmull_rom_smooth(first_half, 1)
+                    //path += ` L ${this.#canvas_width} ${this.#canvas_height / 2}`
+                    path += this.#catmull_rom_smooth(second_half, 1)
+                    //path += `L 0 ${this.#canvas_height / 2}`
+                }
+                else {
+                    path += this.#catmull_rom_smooth(arr, 1)
+                }
+                path += `Z`
                 break
             }
         }
@@ -260,9 +369,15 @@ export class AudioVisual {
     on_data(fn: ((data: Float32Array) => void)) {
         this.#subscriber_fns.push(fn)
     }
+    /**
+     * Useful for waveforms or shapes that don't need to redraw every frame
+     */
+    draw_once() {
+        this.#svg_injecting_element.innerHTML = this.#create_svg_element()
+        this.#subscriber_fns.forEach((fn) => fn(this.#fft_data))
+    }
 
     draw() {
-        this.#analyzer_node.getFloatFrequencyData(this.#fft_data)
         this.#svg_injecting_element.innerHTML = this.#create_svg_element()
         this.#subscriber_fns.forEach((fn) => fn(this.#fft_data))
         requestAnimationFrame(this.draw.bind(this))
@@ -381,11 +496,11 @@ export class AudioVisualBuilder {
      * @param shape_type Circle = 0; Line = 1;
      * @returns `new AudioVisual`
      */
-    build(shape_type: ShapeType) {
-        const shape = this.#create_shape(shape_type)
+    build(shape_type: ShapeType, symmetry: boolean, waveform_options?: WaveformOptions) {
+        const shape = this.#create_shape(shape_type, symmetry, waveform_options)
         return new AudioVisual(this.#analyzer_node, this.#svg_injecting_element, shape, this.#buffer_length, this.#fft_multipier, this.#fft_offset, this.#from_fft_range, this.#to_fft_range, this.#point_count)
     }
-    #create_shape(shape_type: ShapeType): Shape {
+    #create_shape(shape_type: ShapeType, symmetry: boolean, waveform_options?: WaveformOptions): Shape {
         const point_amount = this.#get_cured_frequency_data().length
         let new_shape: Shape
         switch (shape_type) {
@@ -394,7 +509,7 @@ export class AudioVisualBuilder {
                 for (let i = 0; i < point_amount; i++) {
                     points.push({
                         x: (this.#canvas_width / point_amount) * i,
-                        y: this.#canvas_height / 2 - (0 / point_amount) * i,
+                        y: 0,
                     })
                 }
                 new_shape = { shape_type, points, smoothing_algorythm: this.#smoothing_algorythm }
@@ -413,20 +528,49 @@ export class AudioVisualBuilder {
                 new_shape = { shape_type, points, smoothing_algorythm: this.#smoothing_algorythm }
                 break
             }
+            case ShapeType.Waveform: {
+                if (waveform_options === undefined) {
+                    console.error("Waveform options undefined at shapetype.waveform, please define!")
+                    throw Error("Waveform options undefined at shapetype.waveform, please define!")
+                }
+                const fft_length = this.#get_cured_frequency_data(waveform_options.fft_data).length
+                const points = []
+                for (let i = 0; i < fft_length; i++) {
+                    let x, y
+                    if (waveform_options.shape_type == WaveformShape.LineLike) {
+                        x = (this.#canvas_width / point_amount) * i
+                        y = this.#canvas_height / 2
+                    } else {
+                        throw Error("WaveformShape.Striped not implemented yet")
+                    }
+                    waveform_options.orientation == WaveformOrientation.Horizontal ?
+                        points.push({ x: x, y: y }) :
+                        points.push({ x: y, y: x })
+                    //Douple the points needed for symmetry
+                    if (symmetry) {
+                        waveform_options.orientation == WaveformOrientation.Horizontal ?
+                            points.push({ x: x, y: y }) :
+                            points.push({ x: y, y: x })
+                    }
+                }
+                new_shape = { shape_type, points, smoothing_algorythm: this.#smoothing_algorythm, symmetry: symmetry, waveform_options: waveform_options }
+            }
         }
-
         return new_shape
     }
-    #get_cured_frequency_data() {
-        const fft_data_array = new Float32Array(this.#buffer_length)
-        this.#analyzer_node.getFloatFrequencyData(fft_data_array)
+
+    #get_cured_frequency_data(fft_data?: Float32Array) {
+        if (!fft_data) {
+            fft_data = new Float32Array(this.#buffer_length)
+            this.#analyzer_node.getFloatFrequencyData(fft_data)
+        }
         const from = Math.round((this.#point_count / 100) * this.#from_fft_range)
         const to = Math.round(this.#buffer_length - (this.#buffer_length / 100) * this.#to_fft_range)
         const squeezeFactor = Math.round((this.#buffer_length - to) / this.#point_count)
 
         const return_array = new Array(this.#point_count)
         for (let i = 0; i < this.#point_count; i++) {
-            return_array[i] = fft_data_array[from + i * squeezeFactor]
+            return_array[i] = fft_data[from + i * squeezeFactor]
         }
         return return_array
     }
