@@ -1,5 +1,5 @@
 {
-  "name": "preprocessor",
+  "name": "@euterpe.js/preprocessor",
   "private": true,
   "version": "0.0.0",
   "type": "module",

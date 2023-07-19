@@ -69,7 +69,7 @@ interface SongConstructor {
     key?: string
     fft_data?: number[]
     id?: ID,
-    metadata?: Map<string, any>
+    metadata?: any[]
 }
 class Song {
     name: string
@@ -83,7 +83,7 @@ class Song {
     bpm?: number
     key?: string
     fft_data?: number[]
-    metadata: Map<string, any>
+    metadata: any[]
     /**
     * The ID is always there, don't worry :)
     */
@@ -101,7 +101,7 @@ class Song {
         this.key = data.key
         this.fft_data = data.fft_data
         this.id = data.id
-        this.metadata = data.metadata || new Map<string, any>
+        this.metadata = data.metadata || []
     }
 }
 
@@ -112,7 +112,7 @@ interface ArtistConstructor {
     collections?: Ref[]
     links?: [Platforms, URL][]
     id?: ID
-    metadata?: Map<string, any>
+    metadata?: any[]
 }
 class Artist {
     name = ""
@@ -120,7 +120,7 @@ class Artist {
     songs: Ref[]
     collections: Ref[]
     links?: [Platforms, URL][]
-    metadata: Map<string, any>
+    metadata: any[]
     /**
  * The ID is always there, don't worry :)
  */
@@ -132,7 +132,7 @@ class Artist {
         this.collections = data.collections || []
         this.links = data.links
         this.id = data.id
-        this.metadata = data.metadata || new Map<string, any>
+        this.metadata = data.metadata || []
     }
 }
 interface CollectionConstructor {
@@ -142,7 +142,7 @@ interface CollectionConstructor {
     duration?: number
     publish_date?: Date
     id?: ID
-    metadata?: Map<string, any>
+    metadata?: any[]
     name?: string
     type?: CollectionType
 
@@ -155,7 +155,7 @@ class Collection {
     cover?: URL
     duration?: number
     publish_date?: Date
-    metadata: Map<string, any>
+    metadata: any[]
     /**
      * The ID is always there, don't worry :)
      */
@@ -168,7 +168,7 @@ class Collection {
         this.publish_date = data.publish_date
         this.id = data.id
         this.name = data.name
-        this.metadata = data.metadata ? data.metadata : new Map<string, any>
+        this.metadata = data.metadata ? data.metadata : []
     }
 }
 class DB {

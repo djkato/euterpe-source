@@ -177,7 +177,7 @@ export class AudioVisual {
             const cp2x = x2 - (x3 - x1) / 6 * k
             const cp2y = y2 - (y3 - y1) / 6 * k
 
-            path += "C" + [cp1x, cp1y, cp2x, cp2y, x2, y2]
+            path += "C" + [cp1x.toFixed(2), cp1y.toFixed(2), cp2x.toFixed(2), cp2y.toFixed(2), x2.toFixed(2), y2.toFixed(2)]
         }
         return path
     }
@@ -287,7 +287,7 @@ export class AudioVisual {
                 switch (this.#shape.shape_type) {
                     case ShapeType.Line: {
                         for (let i = 0; i < arr.length; i++) {
-                            path += `L ${arr[i].x},${arr[i].y} `
+                            path += `L ${arr[i].x.toFixed(2)},${arr[i].y.toFixed(2)} `
                         }
                         if (this.#shape.shape_type == ShapeType.Line) {
                             path += `L ${this.#canvas_width} ${this.#canvas_height} `
@@ -297,16 +297,16 @@ export class AudioVisual {
                     }
                     case ShapeType.Circle: {
                         for (let i = 0; i < arr.length; i++) {
-                            path += `L ${arr[i].x},${arr[i].y} `
+                            path += `L ${arr[i].x.toFixed(2)},${arr[i].y.toFixed(2)} `
                         }
                         break
                     }
                     case ShapeType.Waveform: {
                         for (let i = 0; i < arr.length; i += 2) {
-                            path += `L ${arr[i].x},${arr[i].y} `
+                            path += `L ${arr[i].x.toFixed(2)},${arr[i].y.toFixed(2)} `
                         }
                         for (let i = arr.length - 1; i >= 0; i -= 2) {
-                            path += `L ${arr[i].x},${arr[i].y} `
+                            path += `L ${arr[i].x.toFixed(2)},${arr[i].y.toFixed(2)} `
                         }
                     }
                 }
@@ -318,7 +318,7 @@ export class AudioVisual {
                 const anchors = this.#create_perpendicular_anchors(arr)
 
                 for (let i = 1; i < arr.length; i++) {
-                    path += `C ${anchors[i - 1].rightAnchor.x} ${anchors[i - 1].rightAnchor.y} ${anchors[i].leftAnchor.x} ${anchors[i].leftAnchor.y} ${arr[i].x} ${arr[i].y} `
+                    path += `C ${anchors[i - 1].rightAnchor.x.toFixed(2)} ${anchors[i - 1].rightAnchor.y.toFixed(2)} ${anchors[i].leftAnchor.x.toFixed(2)} ${anchors[i].leftAnchor.y.toFixed(2)} ${arr[i].x.toFixed(2)} ${arr[i].y.toFixed(2)} `
                 }
                 if (this.#shape.shape_type == ShapeType.Line) {
                     //path += `L ${this.canvasWidth} ${this.canvasHeight / 2} `

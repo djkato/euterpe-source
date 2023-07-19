@@ -11,6 +11,7 @@ export async function start() {
         console.log("Creating svgs...")
         const waveform_canvas = document.querySelector("#waveform-canvas") as SVGSVGElement
         for (const song of result.db.songs) {
+            console.log("creating waveform for -> " + song.name)
             const waveform_visual_builder = new AudioVisualBuilder(result.analyzer_node, waveform_canvas)
                 .set_fft_data_tresholds({ point_count_i: 100, fft_multiplier_i: 1, fft_offset_i: -80 })
                 .set_fft_time_smoothing(0.8)
@@ -18,9 +19,12 @@ export async function start() {
             const waveform_visual = waveform_visual_builder.build(ShapeType.Waveform, true, { fft_data: new Float32Array(new Float64Array(song.fft_data!)), orientation: WaveformOrientation.Horizontal, shape_type: WaveformShape.LineLike })
             waveform_visual.draw_once()
             await new Promise<void>((done) => setTimeout(() => done(), 300))
-            song.metadata.set("waveform-svg", waveform_canvas.innerHTML)
+            // @ts-ignore
+            song.metadata[0] = waveform_canvas.innerHTML
+            song.fft_data = []
         }
-        console.log(result.db)
+        console.dir(result.db, { depth: null })
+        console.log(JSON.stringify(result.db))
     })
 }
 async function analyze(): Promise<AnalyzeReturn> {
