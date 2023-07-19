@@ -6,7 +6,8 @@ export {
     DB,
     Artist,
     Platforms,
-    CollectionType
+    CollectionType,
+    from_json
 }
 type ID = number
 enum RefTo {
@@ -51,6 +52,10 @@ class Ref {
         }
     }
 }
+function ref_from_json(ref: any): Ref {
+    return new Ref(ref.to, ref.id)
+}
+
 interface SongConstructor {
     name: string
     artists: Ref[]
@@ -111,7 +116,7 @@ interface ArtistConstructor {
 }
 class Artist {
     name = ""
-    pfp?: URL
+    pfp?: URL | string
     songs: Ref[]
     collections: Ref[]
     links?: [Platforms, URL][]
@@ -238,6 +243,49 @@ class DB {
         this.collections.sort((a, b) => a.id! - b.id!)
         this.artists.sort((a, b) => a.id! - b.id!)
     }
+
+}
+function from_json(db_stringified: { artists?: any, songs?: any, collections?: any }): DB {
+    const db = new DB
+    if (db_stringified.artists) {
+        for (const artist of db_stringified.artists) {
+            if (artist.songs) artist.songs = artist.songs.map((e: any) => ref_from_json(e))
+            if (artist.collections) artist.collections = artist.collections.map((e: any) => ref_from_json(e))
+            if (artist.links) artist.links = artist.links.map((e: any) => { try { [e[0] as Platforms, new URL(e[1])] } catch (e) { console.log(e) } })
+            if (artist.publish_date) artist.publish_date = new Date(JSON.parse(artist.publish_date))
+            if (artist.id) artist.id = artist.id as ID
+            try { if (artist.pfp) artist.pfp = new URL(artist.pfp) }
+            catch (e) { console.error(e), console.error("failed to parse artist URL") }
+            db.artists.push(artist)
+        }
+    }
+    if (db_stringified.songs) {
+        for (const song of db_stringified.songs) {
+            if (song.artists) song.artists = song.artists.map((e: any) => ref_from_json(e))
+            if (song.remix_artists) song.remix_artists = song.remix_artists.map((e: any) => ref_from_json(e))
+            if (song.in_collection) song.in_collection = ref_from_json(song.in_collection)
+            try { if (song.cover) song.cover = new URL(song.cover) }
+            catch (e) { console.error(e), console.error("failed to parse artist URL") }
+            try { if (song.publish_date) song.publish_date = new Date(JSON.parse(song.publish_date)) }
+            catch (e) { console.error(e), console.error("Failed to song cover url") }
+            if (song.id) song.id = song.id as ID
+            db.songs.push(song)
+        }
+    }
+    if (db_stringified.collections) {
+        for (const collection of db_stringified.collections) {
+            if (collection.artists) collection.artists = collection.artists.map((e: any) => ref_from_json(e))
+            if (collection.songs) collection.songs = collection.songs.map((e: any) => ref_from_json(e))
+            if (collection.type) collection.type = collection.type.map((e: any) => e as CollectionType)
+            try { if (collection.publish_date) collection.publish_date = new Date(JSON.parse(collection.publish_date)) }
+            catch (e) { console.error(e), console.error("Failed to parse date") }
+            try { if (collection.cover) collection.cover = new URL(collection.cover) }
+            catch (e) { console.error(e), console.error("failed to parse collection cover url") }
+            if (collection.id) collection.id = collection.id as ID
+            db.collections.push(collection)
+        }
+    }
+    return db
 }
 // const db = new DB
 // db.add(
