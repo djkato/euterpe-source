@@ -1,0 +1,21 @@
+{
+  "name": "preprocessor",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "crawl": "node crawler.mjs",
+    "process": "node crawler.mjs && vite",
+    "serve": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.2",
+    "vite": "^4.4.0"
+  },
+  "dependencies": {
+    "filehound": "^1.17.6",
+    "@euterpe.js/music-library": "*"
+  }
+}

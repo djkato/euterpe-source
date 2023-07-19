@@ -58,9 +58,9 @@ function ref_from_json(ref: any): Ref {
 
 interface SongConstructor {
     name: string
-    artists: Ref[]
+    artists?: Ref[]
     url: URL
-    duration: number
+    duration?: number
     publish_date?: Date
     remix_artists?: Ref[]
     in_collection?: Ref
@@ -69,13 +69,13 @@ interface SongConstructor {
     key?: string
     fft_data?: number[]
     id?: ID,
-    metadata: any
+    metadata?: Map<string, any>
 }
 class Song {
     name: string
     artists: Ref[]
     url: URL
-    duration: number
+    duration?: number
     remix_artists: Ref[]
     publish_date?: Date
     in_collection?: Ref
@@ -83,7 +83,7 @@ class Song {
     bpm?: number
     key?: string
     fft_data?: number[]
-    metadata: any
+    metadata: Map<string, any>
     /**
     * The ID is always there, don't worry :)
     */
@@ -101,7 +101,7 @@ class Song {
         this.key = data.key
         this.fft_data = data.fft_data
         this.id = data.id
-        this.metadata = data.metadata
+        this.metadata = data.metadata || new Map<string, any>
     }
 }
 
@@ -112,15 +112,15 @@ interface ArtistConstructor {
     collections?: Ref[]
     links?: [Platforms, URL][]
     id?: ID
-    metadata: any
+    metadata?: Map<string, any>
 }
 class Artist {
     name = ""
-    pfp?: URL | string
+    pfp?: URL
     songs: Ref[]
     collections: Ref[]
     links?: [Platforms, URL][]
-    metadata: any
+    metadata: Map<string, any>
     /**
  * The ID is always there, don't worry :)
  */
@@ -132,17 +132,17 @@ class Artist {
         this.collections = data.collections || []
         this.links = data.links
         this.id = data.id
-        this.metadata = data.metadata
+        this.metadata = data.metadata || new Map<string, any>
     }
 }
 interface CollectionConstructor {
     artists: Ref[]
     songs: Ref[]
-    cover: URL
-    duration: number
+    cover?: URL
+    duration?: number
     publish_date?: Date
     id?: ID
-    metadata: any
+    metadata?: Map<string, any>
     name?: string
     type?: CollectionType
 
@@ -152,10 +152,10 @@ class Collection {
     type?: CollectionType
     artists: Ref[]
     songs: Ref[]
-    cover: URL
-    duration: number
+    cover?: URL
+    duration?: number
     publish_date?: Date
-    metadata: any
+    metadata: Map<string, any>
     /**
      * The ID is always there, don't worry :)
      */
@@ -168,7 +168,7 @@ class Collection {
         this.publish_date = data.publish_date
         this.id = data.id
         this.name = data.name
-        this.metadata = data.metadata
+        this.metadata = data.metadata ? data.metadata : new Map<string, any>
     }
 }
 class DB {
