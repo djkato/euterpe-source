@@ -162,7 +162,8 @@ export class MusicPlayer {
     try_play_toggle_async() {
         return new Promise((resolve, reject) => {
             if (this.audio_context.state === "suspended" || this.audio_context.state === "closed") {
-                reject("Context closed or suspended")
+                this.audio_context.resume().then(undefined, (e) =>
+                    reject("Context closed or suspended" + e))
             }
             if (this.audio_element.paused) {
                 this.audio_element.play().then((s) => {
@@ -224,7 +225,8 @@ export class MusicPlayer {
         return new Promise((resolve, reject) => {
             if (this.is_playing) reject(Error("Already playing"))
             if (this.audio_context.state === "suspended" || this.audio_context.state === "closed") {
-                reject("Context closed or suspended")
+                this.audio_context.resume().then(undefined, (e) =>
+                    reject("Context closed or suspended" + e))
             }
             this.audio_element.play().then((s) => {
                 this.is_playing = true
@@ -276,6 +278,7 @@ export class MusicPlayer {
     try_new_song_async(path: string) {
         return new Promise((resolve, reject) => {
             this.audio_element.src = this.current_song_path = path
+            this.current_song_duration = this.audio_element.duration
             //Found out today about this. Such a nice new way to mass remove event listeners!
             const controller = new AbortController();
 

@@ -54,7 +54,7 @@ class Euterpe extends Player.MusicPlayer {
                 if (next_id == this.db.songs.length) reject(new Error("Won't go past the last song"))
                 new_song = this.db.songs.find((song) => song.id == next_id)!
             }
-            this.try_new_song_async(new_song.url.href).then(
+            this.try_new_song_async(new_song.url.toString()).then(
                 () => {
                     this.try_play_async().then((s) => {
                         if (this.current_song) this.played_history.push(this.current_song)
@@ -85,7 +85,7 @@ class Euterpe extends Player.MusicPlayer {
                 if (next_id == this.db.songs.length) next_id = this.db.songs[0].id!
                 new_song = this.db.songs.find((song) => song.id == next_id)!
             }
-            this.try_new_song_async(new_song.url.href).then(
+            this.try_new_song_async(new_song.url.toString()).then(
                 () => {
                     this.try_play_async().then((s) => {
                         if (this.current_song) this.played_history.push(this.current_song)
@@ -114,7 +114,7 @@ class Euterpe extends Player.MusicPlayer {
             if (next_id == this.db.songs.length) next_id = this.db.songs[0].id!
             new_song = this.db.songs.find((song) => song.id == next_id)!
         }
-        this.new_song(new_song.url.href)
+        this.new_song(new_song.url.toString())
         this.play()
         if (this.current_song) this.played_history.push(this.current_song)
         this.current_song = new_song
@@ -135,7 +135,7 @@ class Euterpe extends Player.MusicPlayer {
             if (next_id == this.db.songs.length) throw new Error("Won't go past the last song")
             new_song = this.db.songs.find((song) => song.id == next_id)!
         }
-        this.new_song(new_song.url.href)
+        this.new_song(new_song.url.toString())
         this.play()
         if (this.current_song) this.played_history.push(this.current_song)
         this.current_song = new_song
@@ -149,7 +149,7 @@ class Euterpe extends Player.MusicPlayer {
             const new_song = this.db.songs.find((song) => song.id! == new_song_id)
             if (!new_song) reject(new Error(`No song with id "${new_song_id}" found`))
             else {
-                this.try_new_song_async(new_song.url.href).then(
+                this.try_new_song_async(new_song.url.toString()).then(
                     () => {
                         this.try_play_async().then((s) => {
                             if (this.current_song) this.played_history.push(this.current_song)
@@ -171,7 +171,7 @@ class Euterpe extends Player.MusicPlayer {
             const new_song = this.db.songs.find((song) => song.id! == new_song_id)
             if (!new_song) reject(new Error(`No song with id "${new_song_id}" found`))
             else {
-                this.try_new_song_async(new_song.url.href).then(
+                this.try_new_song_async(new_song.url.toString()).then(
                     () => {
                         this.play_async().then((s) => {
                             if (this.current_song) this.played_history.push(this.current_song)
@@ -192,7 +192,7 @@ class Euterpe extends Player.MusicPlayer {
         const new_song = this.db.songs.find((song) => song.id! == new_song_id)
         if (!new_song) throw new Error(`No song with id "${new_song_id}" found`)
         else {
-            this.new_song(new_song.url.href)
+            this.new_song(new_song.url.toString())
             this.play()
             if (this.current_song) this.played_history.push(this.current_song)
             this.current_song = new_song
@@ -216,7 +216,7 @@ class Euterpe extends Player.MusicPlayer {
                 if (next_id == this.db.songs.length) reject(new Error("Won't roll backwards to last song"))
                 new_song = this.db.songs.find((song) => song.id == next_id)!
             }
-            this.try_new_song_async(new_song.url.href).then(
+            this.try_new_song_async(new_song.url.toString()).then(
                 () => {
                     this.try_play_async().then((s) => {
                         //if (this.current_song) this.played_history.push(this.current_song)
@@ -247,7 +247,7 @@ class Euterpe extends Player.MusicPlayer {
                 if (next_id == -1) next_id = this.db.songs[this.db.songs.length - 1].id!
                 new_song = this.db.songs.find((song) => song.id == next_id)!
             }
-            this.try_new_song_async(new_song.url.href).then(
+            this.try_new_song_async(new_song.url.toString()).then(
                 () => {
                     this.try_play_async().then((s) => {
                         //if (this.current_song) this.played_history.push(this.current_song)
@@ -276,7 +276,7 @@ class Euterpe extends Player.MusicPlayer {
             if (next_id == this.db.songs.length) throw new Error("Won't go past the last song")
             new_song = this.db.songs.find((song) => song.id == next_id)!
         }
-        this.new_song(new_song.url.href)
+        this.new_song(new_song.url.toString())
         this.play()
         //if (this.current_song) this.played_history.push(this.current_song)
         this.current_song_id = new_song.id!
@@ -298,7 +298,7 @@ class Euterpe extends Player.MusicPlayer {
             if (next_id == this.db.songs.length) next_id = this.db.songs[this.db.songs.length].id!
             new_song = this.db.songs.find((song) => song.id == next_id)!
         }
-        this.new_song(new_song.url.href)
+        this.new_song(new_song.url.toString())
         this.play()
         //if (this.current_song) this.played_history.push(this.current_song)
         this.current_song_id = new_song.id!
