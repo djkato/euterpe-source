@@ -6,7 +6,6 @@ document.getElementById("button")!.addEventListener("click", (ev) => {
     start()
 })
 export async function start() {
-    generate_db()
     analyze().then(async (result) => {
         console.log("Creating svgs...")
         const waveform_canvas = document.querySelector("#waveform-canvas") as SVGSVGElement
@@ -24,7 +23,7 @@ export async function start() {
             song.fft_data = []
         }
         console.dir(result.db, { depth: null })
-        console.log(JSON.stringify(result.db))
+        download(JSON.stringify(result.db), "db.json", "text/plain")
     })
 }
 async function analyze(): Promise<AnalyzeReturn> {
@@ -46,6 +45,7 @@ async function analyze(): Promise<AnalyzeReturn> {
     track.connect(audioContextAnalyser).connect(gain).connect(audioContext.destination)
 
     let db = generate_db()
+    console.log(db)
     for (const song of db.songs) {
         // const song = db.songs[db.songs.length - 1]
         console.log(`Analyzing ${song.name}, ${db.songs.indexOf(song) + 1}/${db.songs.length}`)
@@ -72,6 +72,14 @@ async function analyze(): Promise<AnalyzeReturn> {
     const result: AnalyzeReturn = { analyzer_node: audioContextAnalyser, db: db }
     return result
 }
+function download(content: BlobPart, fileName: string, contentType: string) {
+    var a = document.createElement("a");
+    var file = new Blob([content], { type: contentType });
+    a.href = URL.createObjectURL(file);
+    a.download = fileName;
+    a.click();
+}
+
 type AnalyzeReturn = {
     analyzer_node: AnalyserNode,
     db: DB

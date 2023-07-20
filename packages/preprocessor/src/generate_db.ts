@@ -26,9 +26,10 @@ export function generate_db() {
             })])
             collections.push(collection_name)
         }
+
         let col = db.collections.find(col => col.name == collection_name)!
         let col_id = col.id
-        new_songs.push({ song: song, collection_id: col_id })
+        new_songs.push({ song: song, collection_id: col_id! })
     }
 
     //create songs
@@ -38,14 +39,13 @@ export function generate_db() {
 
         const name = song.song.slice(last_i + 1)
         const song_url = song.song.replace("\\\\", "/").slice(7)
-
         const db_song = new Song({
             name: name.slice(0, name.lastIndexOf(".")),
             artists: [],
             url: new URL("http://localhost:4200/" + song_url),
             duration: 0,
             remix_artists: [],
-            in_collection: new Ref(RefTo.Collections, song.collection_id!)
+            in_collection: new Ref(RefTo.Collections, song.collection_id)
         })
         db.add([db_song])
     }

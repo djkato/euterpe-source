@@ -47,7 +47,7 @@ class Ref {
                 return from.songs.find((song) => song.id == this.id)
             }
             case RefTo.Collections: {
-                return from.collections.find((col) => col.id = this.id)
+                return from.collections.find((col) => col.id == this.id)
             }
         }
     }
@@ -195,7 +195,6 @@ class DB {
             if (input instanceof Artist) {
                 const artist = input as Artist
                 if (!artist.id) artist.id = this.artists.length
-                this.artists.push(artist)
 
                 for (const song_ref of artist.songs) {
                     const curr_song = song_ref.get(this) as Song
@@ -206,12 +205,12 @@ class DB {
                     const curr_col = col_ref.get(this) as Collection
                     curr_col?.artists.push(new Ref(RefTo.Artists, artist.id))
                 }
+                this.artists.push(artist)
             }
 
             else if (input instanceof Collection) {
                 const col = input as Collection
                 if (!col.id) col.id = this.collections.length
-                this.collections.push(col)
 
                 for (const song_ref of col.songs) {
                     const curr_song = song_ref.get(this) as Song
@@ -221,22 +220,30 @@ class DB {
                     const curr_artist = artist_ref.get(this) as Artist
                     curr_artist.collections.push(new Ref(RefTo.Collections, col.id))
                 }
-
+                this.collections.push(col)
             }
+
             else if (input instanceof Song) {
                 const song = input as Song
                 if (!song.id) song.id = this.songs.length
-                this.songs.push(song)
 
                 if (song.in_collection) {
                     const curr_col = song.in_collection.get(this) as Collection
-                    curr_col?.songs.push(new Ref(RefTo.Songs, song.id))
+                    curr_col.songs.push(new Ref(RefTo.Songs, song.id))
+                    song.artists.forEach((artist) => curr_col.artists.push(new Ref(RefTo.Artists, artist.get(this)!.id!)))
+                    song.remix_artists.forEach((artist) => curr_col.artists.push(new Ref(RefTo.Artists, artist.get(this)!.id!)))
                 }
 
                 for (const artist_ref of song.artists) {
                     const curr_artist = artist_ref.get(this) as Artist
                     curr_artist.songs.push(new Ref(RefTo.Songs, song.id))
                 }
+
+                for (const artist_ref of song.remix_artists) {
+                    const curr_artist = artist_ref.get(this) as Artist
+                    curr_artist.songs.push(new Ref(RefTo.Songs, song.id))
+                }
+                this.songs.push(song)
             }
         }
         this.songs.sort((a, b) => a.id! - b.id!)
