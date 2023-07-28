@@ -86,10 +86,10 @@ export class MusicPlayer {
     time = 0
     #pub_sub = new PubSub
     constructor(
-        private audio_context: AudioContext,
+        public audio_context: AudioContext,
         private audio_element: HTMLAudioElement,
         public track: MediaElementAudioSourceNode,
-        private gain: GainNode,
+        public gain: GainNode,
         public volume: number,
         private current_song_path?: string) {
         this.#volume_cache = volume
@@ -278,7 +278,6 @@ export class MusicPlayer {
     try_new_song_async(path: string) {
         return new Promise((resolve, reject) => {
             this.audio_element.src = this.current_song_path = path
-            this.current_song_duration = this.audio_element.duration
             //Found out today about this. Such a nice new way to mass remove event listeners!
             const controller = new AbortController();
 
@@ -296,6 +295,11 @@ export class MusicPlayer {
                 controller.abort()
                 reject(e)
             }, { signal: controller.signal })
+
+            //once aborted, try to set current_song_duration
+            controller.signal.addEventListener("abort", () => {
+                this.current_song_duration = this.audio_element.duration
+            })
 
             this.is_playing = false
         })

@@ -18,6 +18,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@euterpe.js/dj": [
+        "packages/dj/src/index.ts"
+      ],
       "@euterpe.js/euterpe": [
         "packages/euterpe/src/index.ts"
       ],
