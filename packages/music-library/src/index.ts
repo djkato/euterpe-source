@@ -268,6 +268,7 @@ function from_json(db_stringified: { artists?: any, songs?: any, collections?: a
     }
     if (db_stringified.songs) {
         for (const song of db_stringified.songs) {
+            try { if (song.url) song.url = new URL(song.url) } catch (e) { console.error("failed to parse song.url" + e) }
             if (song.artists) song.artists = song.artists.map((e: any) => ref_from_json(e))
             if (song.remix_artists) song.remix_artists = song.remix_artists.map((e: any) => ref_from_json(e))
             if (song.in_collection) song.in_collection = ref_from_json(song.in_collection)

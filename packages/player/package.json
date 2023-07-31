@@ -1,6 +1,6 @@
 {
 	"name": "@euterpe.js/player",
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"type": "module",
 	"description": "A simple, safe AudioContext web music player",
 	"main": "./src/index.js",

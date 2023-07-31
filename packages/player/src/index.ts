@@ -281,7 +281,7 @@ export class MusicPlayer {
             //Found out today about this. Such a nice new way to mass remove event listeners!
             const controller = new AbortController();
 
-            this.audio_element.addEventListener("canplaythrough", function canplay_listener(s) {
+            this.audio_element.addEventListener("canplay", function canplay_listener(s) {
                 controller.abort()
                 resolve(s)
             }, { signal: controller.signal })
