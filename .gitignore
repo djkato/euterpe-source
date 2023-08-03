@@ -37,3 +37,17 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+# video and audio files
+*.mp3
+*.mp4
+*.mov
+*.webm
+*.webp
+*.ogg
+*.wav
+*.avi
+*.png
+*.jpeg
+*.jpg
+*.exr

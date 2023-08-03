@@ -42,7 +42,7 @@ export function generate_db() {
         const db_song = new Song({
             name: name.slice(0, name.lastIndexOf(".")),
             artists: [],
-            url: new URL("http://localhost:4200/" + song_url),
+            url: new URL("http://localhost:4201/" + song_url),
             duration: 0,
             remix_artists: [],
             in_collection: new Ref(RefTo.Collections, song.collection_id)

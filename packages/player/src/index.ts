@@ -124,37 +124,17 @@ export class MusicPlayer {
         return new Promise((resolve, reject) => {
             if (this.track.context.state == "closed" || this.track.context.state == "suspended") {
                 this.is_playing = false
-                reject("Can't seek - track not playing")
+                reject(new Error("Can't seek - track not playing"))
             }
             this.audio_element.currentTime = new_time
             resolve(null)
-            /*audio_element.play().then((s) => resolve(s), (r) => {
-                is_playing = false
-                reject(r)
-            })*/
         })
     }
-    // THIS MIGHT BE UNNECESSARY? CUZ SEEKING DOESN'T REQUIRE PLAY
-    // /**
-    // * Can try to seek even if the audio context was suspended or closed. Best to use try_seek_async()
-    // */
-    // seek_async(new_time: number) {
-    //     return new Promise((resolve, reject) => {
-    //         this.audio_element.currentTime = new_time
-    //         resolve(null)
-    //         /* audio_element.play().then((s) => resolve(s), (r) => {
-    //             is_playing = false
-    //             reject(r)
-    //         })*/
-    //     })
-    // // }
-    // /**
-    //  * Unsafe, throws error if failed. Use try_seek_async or seek_async unless you don't care about the result.
-    //  */
-
+    /**
+     * Unsafe, throws error if failed. Use try_seek_async or seek_async unless you don't care about the result.
+     */
     seek(new_time: number) {
         this.audio_element.currentTime = new_time
-        //this.audio_element.play().catch((e) => { throw e })
     }
     /**
     * Safer play_toggle_async. Normal play_toggle will try to start the player even if the track hasn't started yet, or was previously suspended/closed
@@ -163,7 +143,7 @@ export class MusicPlayer {
         return new Promise((resolve, reject) => {
             if (this.audio_context.state === "suspended" || this.audio_context.state === "closed") {
                 this.audio_context.resume().then(undefined, (e) =>
-                    reject("Context closed or suspended" + e))
+                    reject(new Error("Context closed or suspended" + JSON.stringify(e))))
             }
             if (this.audio_element.paused) {
                 this.audio_element.play().then((s) => {
@@ -171,7 +151,7 @@ export class MusicPlayer {
                     resolve(s)
                 }, (r) => {
                     this.is_playing = false
-                    reject(r)
+                    reject(new Error("failed to play audio elements" + JSON.stringify(r)))
                 })
             } else {
                 this.audio_element.pause()
@@ -194,7 +174,7 @@ export class MusicPlayer {
                     resolve(s)
                 }, (r) => {
                     this.is_playing = false
-                    reject(r)
+                    reject(new Error(JSON.stringify(r)))
                 })
             } else {
                 this.audio_element.pause()
@@ -223,18 +203,27 @@ export class MusicPlayer {
     */
     try_play_async() {
         return new Promise((resolve, reject) => {
-            if (this.is_playing) reject(Error("Already playing"))
+            if (this.is_playing) resolve(Error("Already playing"))
             if (this.audio_context.state === "suspended" || this.audio_context.state === "closed") {
-                this.audio_context.resume().then(undefined, (e) =>
-                    reject("Context closed or suspended" + e))
+                this.audio_context.resume().then(() => {
+                    this.audio_element.play().then((s) => {
+                        this.is_playing = true
+                        resolve(s)
+                    }, (r) => {
+                        this.is_playing = false
+                        reject(new Error(JSON.stringify(r)))
+                    })
+                }, (e) =>
+                    reject(new Error("Context closed or suspended" + JSON.stringify(e))))
+            } else {
+                this.audio_element.play().then((s) => {
+                    this.is_playing = true
+                    resolve(s)
+                }, (r) => {
+                    this.is_playing = false
+                    reject(new Error(JSON.stringify(r)))
+                })
             }
-            this.audio_element.play().then((s) => {
-                this.is_playing = true
-                resolve(s)
-            }, (r) => {
-                this.is_playing = false
-                reject(r)
-            })
         })
     }
     /**
@@ -242,16 +231,13 @@ export class MusicPlayer {
      */
     play_async() {
         return new Promise((resolve, reject) => {
-            if (this.is_playing) resolve(null)
-            if (this.audio_context.state === "suspended" || this.audio_context.state === "closed") {
-                this.audio_context.resume()
-            }
+            if (this.is_playing) resolve(Error("Already playing"))
             this.audio_element.play().then((s) => {
                 this.is_playing = true
                 resolve(s)
             }, (r) => {
                 this.is_playing = false
-                reject(r)
+                reject(new Error(JSON.stringify(r)))
             })
         })
     }
@@ -262,7 +248,7 @@ export class MusicPlayer {
         if (this.is_playing) return
         this.audio_element.play().catch((r) => {
             this.is_playing = false
-            throw r
+            throw new Error(r)
         })
     }
     /**
@@ -288,12 +274,12 @@ export class MusicPlayer {
 
             this.audio_element.addEventListener("error", function error_listener(e) {
                 controller.abort()
-                reject(e)
+                reject(new Error("Failed to load new song, error:" + JSON.stringify(e)))
             }, { signal: controller.signal })
 
             this.audio_element.addEventListener("stalled", function stalled_listener(e) {
                 controller.abort()
-                reject(e)
+                reject(new Error("Failed to load new  song, stalled: " + JSON.stringify(e)))
             }, { signal: controller.signal })
 
             //once aborted, try to set current_song_duration

@@ -6,6 +6,7 @@
   "scripts": {
     "crawl": "node crawler.mjs",
     "process": "node crawler.mjs && vite",
+    "media-process": "cd src && node media_process.js",
     "serve": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview"
@@ -15,7 +16,7 @@
     "vite": "^4.4.0"
   },
   "dependencies": {
-    "filehound": "^1.17.6",
-    "@euterpe.js/music-library": "*"
+    "@euterpe.js/music-library": "*",
+    "filehound": "^1.17.6"
   }
 }

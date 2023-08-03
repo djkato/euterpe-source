@@ -215,8 +215,9 @@ export class AudioVisual {
             case ShapeType.Waveform: {
                 if (this.#shape.waveform_options!.shape_type == WaveformShape.LineLike) {
                     if (this.#shape.symmetry) {
-                        for (let i = 0; i < this.#shape.points.length - 1; i += 2) {
-                            const mutator = this.#convert_range(frequency_data[i / 2] * this.#fft_multiplier + this.#fft_offset, in_range, out_range)
+                        for (let i = 0; i < this.#shape.points.length; i += 2) {
+                            let mutator = this.#convert_range(frequency_data[i / 2] * this.#fft_multiplier + this.#fft_offset, in_range, out_range)
+                            if (mutator <= 0) mutator = 2
                             if (this.#shape.waveform_options!.orientation == WaveformOrientation.Horizontal) {
                                 mutated_points.push({
                                     x: this.#shape.points[i].x,
@@ -262,6 +263,7 @@ export class AudioVisual {
 
     #convert_range(value: number, r1: number[], r2: number[]) {
         if (!isFinite(value)) return 0
+        if (value < r1[0]) return 0
         return ((value - r1[0]) * (r2[1] - r2[0])) / (r1[1] - r1[0]) + r2[0]
     }
 
@@ -340,6 +342,7 @@ export class AudioVisual {
             case SmoothingAlgorythm.CatmullRom: {
                 if (this.#shape.shape_type == ShapeType.Waveform && this.#shape.symmetry == true) {
                     //adding points so both halfs ends and start at the same center point
+                    console.log(arr)
                     const first_half = [{ x: 0, y: this.#canvas_height / 2 }]
                     const second_half = [{ x: 0, y: this.#canvas_height / 2 }]
                     for (let i = 0; i < arr.length - 1; i += 2) {

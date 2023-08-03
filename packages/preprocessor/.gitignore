@@ -25,5 +25,6 @@ dist-ssr
 
 # public samples
 public/samples/*
+public/media/*
 src/song_list.ts
 src/db.js
