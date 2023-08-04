@@ -122,7 +122,7 @@ export class MusicPlayer {
      */
     try_seek_async(new_time: number) {
         return new Promise((resolve, reject) => {
-            if (this.track.context.state == "closed" || this.track.context.state == "suspended") {
+            if (this.track.context.state !== "running") {
                 this.is_playing = false
                 reject(new Error("Can't seek - track not playing"))
             }
@@ -141,9 +141,9 @@ export class MusicPlayer {
     */
     try_play_toggle_async() {
         return new Promise((resolve, reject) => {
-            if (this.audio_context.state === "suspended" || this.audio_context.state === "closed") {
+            if (this.track.context.state !== "running") {
                 this.audio_context.resume().then(undefined, (e) =>
-                    reject(new Error("Context closed or suspended" + JSON.stringify(e))))
+                    reject(e))
             }
             if (this.audio_element.paused) {
                 this.audio_element.play().then((s) => {
@@ -151,7 +151,7 @@ export class MusicPlayer {
                     resolve(s)
                 }, (r) => {
                     this.is_playing = false
-                    reject(new Error("failed to play audio elements" + JSON.stringify(r)))
+                    reject(r)
                 })
             } else {
                 this.audio_element.pause()
@@ -165,7 +165,7 @@ export class MusicPlayer {
      */
     play_toggle_async() {
         return new Promise((resolve, reject) => {
-            if (this.audio_context.state === "suspended" || this.audio_context.state === "closed") {
+            if (this.track.context.state !== "running") {
                 this.audio_context.resume()
             }
             if (this.audio_element.paused) {
@@ -174,7 +174,7 @@ export class MusicPlayer {
                     resolve(s)
                 }, (r) => {
                     this.is_playing = false
-                    reject(new Error(JSON.stringify(r)))
+                    reject(r)
                 })
             } else {
                 this.audio_element.pause()
@@ -204,14 +204,14 @@ export class MusicPlayer {
     try_play_async() {
         return new Promise((resolve, reject) => {
             if (this.is_playing) resolve(Error("Already playing"))
-            if (this.audio_context.state === "suspended" || this.audio_context.state === "closed") {
+            if (this.track.context.state !== "running") {
                 this.audio_context.resume().then(() => {
                     this.audio_element.play().then((s) => {
                         this.is_playing = true
                         resolve(s)
                     }, (r) => {
                         this.is_playing = false
-                        reject(new Error(JSON.stringify(r)))
+                        reject(r)
                     })
                 }, (e) =>
                     reject(new Error("Context closed or suspended" + JSON.stringify(e))))
@@ -221,7 +221,7 @@ export class MusicPlayer {
                     resolve(s)
                 }, (r) => {
                     this.is_playing = false
-                    reject(new Error(JSON.stringify(r)))
+                    reject(r)
                 })
             }
         })
@@ -237,7 +237,7 @@ export class MusicPlayer {
                 resolve(s)
             }, (r) => {
                 this.is_playing = false
-                reject(new Error(JSON.stringify(r)))
+                reject(r)
             })
         })
     }
@@ -248,7 +248,7 @@ export class MusicPlayer {
         if (this.is_playing) return
         this.audio_element.play().catch((r) => {
             this.is_playing = false
-            throw new Error(r)
+            throw r
         })
     }
     /**
@@ -274,12 +274,12 @@ export class MusicPlayer {
 
             this.audio_element.addEventListener("error", function error_listener(e) {
                 controller.abort()
-                reject(new Error("Failed to load new song, error:" + JSON.stringify(e)))
+                reject(e)
             }, { signal: controller.signal })
 
             this.audio_element.addEventListener("stalled", function stalled_listener(e) {
                 controller.abort()
-                reject(new Error("Failed to load new  song, stalled: " + JSON.stringify(e)))
+                reject(e)
             }, { signal: controller.signal })
 
             //once aborted, try to set current_song_duration
@@ -408,7 +408,7 @@ export class MusicPlayerBuilder {
     constructor(private audio_element: HTMLAudioElement) {
         if (audio_element === undefined) throw Error("audio_element was undefined")
         //                                          ↓ For old browsers
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const AudioContext = window.AudioContext;
         this.#audio_context = new AudioContext()
         this.#track = this.#audio_context.createMediaElementSource(audio_element)
         this.#gain = this.#audio_context.createGain()
