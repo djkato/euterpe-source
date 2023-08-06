@@ -1,85 +1,69 @@
 import { db } from "./db";
-import { EuterpeBuilder, Euterpe } from "@euterpe.js/euterpe";
+import { EuterpeBuilder } from "@euterpe.js/euterpe";
 
 let is_seeking = false
 // document.addEventListener("click", start, { once: true })
-let euterpe: Euterpe
-maybe_start()
-function maybe_start() {
-    if (euterpe) return
+const euterpe = new EuterpeBuilder(document.querySelector("#audio")!, db)
+    .build()
+add_library_to_dom()
 
-    euterpe = new EuterpeBuilder(document.querySelector("#audio")!, db)
-        .build()
-    add_library_to_dom()
-    euterpe.preload_song_async(0).then(() => {
-        document.querySelector("#text-playing")!.innerHTML = euterpe.format_current_song()
-    }, (e) => console.log(e + " Failed to preload"))
+euterpe.preload_song_async(0).then(() => {
+    document.querySelector("#text-playing")!.innerHTML = euterpe.format_current_song()
+}, (e) => console.log(e + " Failed to preload"))
 
-    document.querySelector("#seek")?.addEventListener("mouseup", (e) => {
-        euterpe.try_seek_async(e.target?.valueAsNumber).then(() => { console.log("seeked to " + e.target?.valueAsNumber) }, () => {
-            alert("Failed seeking! " + e)
-        })
-        is_seeking = false
+document.querySelector("#seek")?.addEventListener("mouseup", (e) => {
+    euterpe.try_seek_async(e.target?.valueAsNumber).then(() => { console.log("seeked to " + e.target?.valueAsNumber) }, () => {
+        alert("Failed seeking! " + e)
     })
+    is_seeking = false
+})
 
-    // Subscriptions to AudioContext changes, eg. time..
-    euterpe.on_duration_formatted((time) => {
-        document.querySelector("#duration")!.innerHTML = time
-        document.querySelector("#seek")!.max = "" + euterpe.current_song_duration
-    })
+// Subscriptions to AudioContext changes, eg. time..
+euterpe.on_duration_formatted((time) => {
+    document.querySelector("#duration")!.innerHTML = time
+    document.querySelector("#seek")!.max = "" + euterpe.current_song_duration
+})
 
-    euterpe.on_time_tick_formatted((time) => {
-        document.querySelector("#current")!.innerHTML = time
-    })
-    euterpe.on_time_tick((time) => {
-        if (is_seeking) return
-        document.querySelector("#seek")!.value = "" + time
-        dev_queue_update()
-        dev_history_update()
-    })
-
-
-}
+euterpe.on_time_tick_formatted((time) => {
+    document.querySelector("#current")!.innerHTML = time
+})
+euterpe.on_time_tick((time) => {
+    if (is_seeking) return
+    document.querySelector("#seek")!.value = "" + time
+    dev_queue_update()
+    dev_history_update()
+})
 
 document.querySelector("#previous")?.addEventListener("click", () => {
-    maybe_start()
     euterpe.previous_song_async().then(() => {
         document.querySelector("#text-playing")!.innerHTML = euterpe.format_current_song()
     }, (e) => alert(e + "Failed to change song"))
 })
 document.querySelector("#next")?.addEventListener("click", () => {
-    maybe_start()
     euterpe.next_song_async().then(() => {
         document.querySelector("#text-playing")!.innerHTML = euterpe.format_current_song()
     }, (e) => alert(e + "Failed to change song"))
 })
 
 document.querySelector("#play")?.addEventListener("click", () => {
-    maybe_start()
     euterpe.play_async().catch((e) => alert("Failed to play, " + e))
 })
 document.querySelector("#pause")?.addEventListener("click", () => {
-    maybe_start()
     euterpe.pause()
 })
 document.querySelector("#mute")?.addEventListener("click", () => {
-    maybe_start()
     euterpe.mute()
 })
 document.querySelector("#unmute")?.addEventListener("click", () => {
-    maybe_start()
     euterpe.unmute()
 })
 document.querySelector("#toggle-mute")?.addEventListener("click", () => {
-    maybe_start()
     euterpe.mute_toggle()
 })
 document.querySelector("#toggle-play")?.addEventListener("click", () => {
-    maybe_start()
     euterpe.play_toggle_async().catch((e) => alert("failed to toggle pause/play!" + e))
 })
 document.querySelector("#volume")?.addEventListener("input", (e) => {
-    maybe_start()
     euterpe.change_volume(e.target?.valueAsNumber)
 })
 //disables time updates so the time slider doesn't slip away from user

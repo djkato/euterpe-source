@@ -37,26 +37,26 @@ db.add([
         duration: 252,
         name: "Star",
         remix_artists: [new Ref(RefTo.Artists, 5)],
-        url: new URL("http://127.0.0.1:4200/Machinedrum, Tanerelle & Mono Poly - Star (IMANU Remix) final.mp3")
+        url: new URL("http://" + window.location.host + "/Machinedrum, Tanerelle & Mono Poly - Star (IMANU Remix) final.mp3")
     }),
     new Song({
         //If you don't like guessing the IDs, then this is also a way to do it
         artists: [new Ref(RefTo.Artists, db.artists.find((a) => a.name == "Jamie xx")!.id!)],
         duration: 331,
         name: "Sleep Sound",
-        url: new URL("http://127.0.0.1:4200/Jamie xx - Sleep Sound.mp3")
+        url: new URL("http://" + window.location.host + "/Jamie xx - Sleep Sound.mp3")
     }),
     new Song({
         artists: [new Ref(RefTo.Artists, 1)],
         duration: 75,
         name: "wish",
-        url: new URL("http://127.0.0.1:4200/janz - wish.mp3")
+        url: new URL("http://" + window.location.host + "/janz - wish.mp3")
     }),
     new Song({
         artists: [new Ref(RefTo.Artists, 10)],
         duration: 4 * 60 + 5,
         name: "サニーボーイ・ラプソディ",
-        url: new URL("http://127.0.0.1:4200/16.サニーボーイ・ラプソディ.ogg")
+        url: new URL("http://" + window.location.host + "/16.サニーボーイ・ラプソディ.ogg")
     })
 ])
 
