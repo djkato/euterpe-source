@@ -46,7 +46,7 @@ document.querySelector("#next")?.addEventListener("click", () => {
 })
 
 document.querySelector("#play")?.addEventListener("click", () => {
-    euterpe.play_async().catch((e) => alert("Failed to play, " + e))
+    euterpe.try_play_async().catch((e) => alert("Failed to play, " + e))
 })
 document.querySelector("#pause")?.addEventListener("click", () => {
     euterpe.pause()

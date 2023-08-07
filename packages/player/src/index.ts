@@ -469,7 +469,6 @@ export class MusicPlayerBuilder {
             this.#prev_node = this.#gain
         }
         this.#prev_node.connect(this.#audio_context.destination)
-        this.audio_element.preload = "metadata"
         return new MusicPlayer(this.#audio_context, this.audio_element, this.#track, this.#gain, this.#volume)
     }
 }
