@@ -7,14 +7,17 @@ const euterpe = new EuterpeBuilder(document.querySelector("#audio")!, db)
     .build()
 add_library_to_dom()
 
-euterpe.preload_song_async(0).then(() => {
+euterpe.try_preload_song(0).then(() => {
     document.querySelector("#text-playing")!.innerHTML = euterpe.format_current_song()
 }, (e) => console.log(e + " Failed to preload"))
 
 document.querySelector("#seek")?.addEventListener("mouseup", (e) => {
-    euterpe.try_seek_async(e.target?.valueAsNumber).then(() => { console.log("seeked to " + e.target?.valueAsNumber) }, () => {
+    try {
+        euterpe.try_seek(e.target?.valueAsNumber)
+        console.log("seeked to " + e.target?.valueAsNumber)
+    } catch {
         alert("Failed seeking! " + e)
-    })
+    }
     is_seeking = false
 })
 
@@ -35,18 +38,18 @@ euterpe.on_time_tick((time) => {
 })
 
 document.querySelector("#previous")?.addEventListener("click", () => {
-    euterpe.previous_song_async().then(() => {
+    euterpe.try_previous_song_looping().then(() => {
         document.querySelector("#text-playing")!.innerHTML = euterpe.format_current_song()
     }, (e) => alert(e + "Failed to change song"))
 })
 document.querySelector("#next")?.addEventListener("click", () => {
-    euterpe.next_song_async().then(() => {
+    euterpe.try_next_song_looping().then(() => {
         document.querySelector("#text-playing")!.innerHTML = euterpe.format_current_song()
     }, (e) => alert(e + "Failed to change song"))
 })
 
 document.querySelector("#play")?.addEventListener("click", () => {
-    euterpe.try_play_async().catch((e) => alert("Failed to play, " + e))
+    euterpe.try_play().catch((e) => alert("Failed to play, " + e))
 })
 document.querySelector("#pause")?.addEventListener("click", () => {
     euterpe.pause()
@@ -61,7 +64,7 @@ document.querySelector("#toggle-mute")?.addEventListener("click", () => {
     euterpe.mute_toggle()
 })
 document.querySelector("#toggle-play")?.addEventListener("click", () => {
-    euterpe.play_toggle_async().catch((e) => alert("failed to toggle pause/play!" + e))
+    euterpe.try_play_toggle().catch((e) => alert("failed to toggle pause/play!" + e))
 })
 document.querySelector("#volume")?.addEventListener("input", (e) => {
     euterpe.change_volume(e.target?.valueAsNumber)
@@ -99,7 +102,7 @@ function add_library_to_dom() {
 }
 function library_play(e: MouseEvent) {
     const b = e.currentTarget as HTMLButtonElement
-    euterpe.try_specific_song_async(parseInt(b.dataset["id"]!)).then(
+    euterpe.try_specific_song(parseInt(b.dataset["id"]!)).then(
         () => document.querySelector("#text-playing")!.innerHTML = euterpe.format_current_song(),
         (e) => alert(e)
     )

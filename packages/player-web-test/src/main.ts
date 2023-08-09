@@ -4,12 +4,12 @@ const music_player_builder = new MusicPlayerBuilder(audio_el)
 const music_player = music_player_builder.build()
 music_player.change_volume(1)
 
-music_player.try_new_song_async(encodeURI("http://127.0.0.1:4200/nuphory - NVISION (EXTENDED MIX).ogg"))
+music_player.try_new_song(encodeURI("http://" + window.location.host + "/nuphory - NVISION (EXTENDED MIX).ogg"))
     .then(() => {
         let is_seeking = false
         document.querySelector("#play")?.addEventListener("click", () => {
             //const analyser_node = music_player_builder.add_analyser()
-            music_player.play_async()
+            music_player.try_play()
                 .then(() => { console.log("Playing!") }, (e) => alert("Failed to play, " + e))
         })
         document.querySelector("#pause")?.addEventListener("click", () => {
@@ -25,7 +25,7 @@ music_player.try_new_song_async(encodeURI("http://127.0.0.1:4200/nuphory - NVISI
             music_player.mute_toggle()
         })
         document.querySelector("#toggle-play")?.addEventListener("click", () => {
-            music_player.play_toggle_async().then((s) => console.log("toggled play/pause"), (e) => alert("failed to toggle pause/play!" + e))
+            music_player.try_play_toggle().then((s) => console.log("toggled play/pause"), (e) => alert("failed to toggle pause/play!" + e))
         })
         document.querySelector("#volume")?.addEventListener("input", (e) => {
             music_player.change_volume(e.target?.valueAsNumber)
@@ -34,22 +34,25 @@ music_player.try_new_song_async(encodeURI("http://127.0.0.1:4200/nuphory - NVISI
             is_seeking = true;
         })
         document.querySelector("#seek")?.addEventListener("mouseup", (e) => {
-            music_player.try_seek_async(e.target?.valueAsNumber).then(() => { console.log("seeked to " + e.target?.valueAsNumber) }, () => {
+            try {
+                music_player.try_seek(e.target?.valueAsNumber)
+                console.log("seeked to " + e.target?.valueAsNumber)
+            } catch (e) {
                 alert("Failed seeking! " + e)
-            })
+            }
             is_seeking = false
         })
         // Subscriptions to AudioContext changes, eg. time..
-        music_player.subscribe_to_formatted_duration_time((time) => {
-            document.querySelector("#duration").innerHTML = time
-            document.querySelector("#seek").max = "" + music_player.get_current_duration()
+        music_player.on_duration_formatted((time) => {
+            document.querySelector("#duration")!.innerHTML = time
+            document.querySelector("#seek")!.max = "" + music_player.current_song_duration
         })
-        music_player.subscribe_to_formatted_current_time_tick((time) => {
-            document.querySelector("#current").innerHTML = time
+        music_player.on_time_tick_formatted((time) => {
+            document.querySelector("#current")!.innerHTML = time
         })
-        music_player.subscribe_to_time_tick((time) => {
+        music_player.on_time_tick((time) => {
             if (is_seeking) return
-            document.querySelector("#seek").value = "" + time
+            document.querySelector("#seek")!.value = "" + time
         })
 
     }, (e) => console.log(e))

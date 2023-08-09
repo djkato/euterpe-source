@@ -118,73 +118,50 @@ export class MusicPlayer {
         this.volume = this.gain.gain.value = volume_i
     }
     /**
-     * Safer seek_async. Normal seek will try to start the player even if the track hasn't started yet, or was previously suspended/closed
+     * Safer seek_async. Normal seek will try to start the player even if the track hasn't started yet, or was previously suspended/closed.
+     * Will also resume playback if player is paused (by finishing the song etc)
+     * @throws if "Can't seek - Audiocontext is not running"
      */
-    try_seek_async(new_time: number) {
-        return new Promise((resolve, reject) => {
-            if (this.track.context.state !== "running") {
-                this.is_playing = false
-                reject(new Error("Can't seek - track not playing"))
-            }
-            this.audio_element.currentTime = new_time
-            resolve(null)
-        })
+    async try_seek(new_time: number) {
+        if (this.audio_context.state !== "running") {
+            this.is_playing = false
+            throw new Error("Can't seek - audioContext not running, audio_context.state : " + this.audio_context.state)
+        }
+        if (this.audio_element.paused) await this.try_play()
+        this.audio_element.currentTime = new_time
     }
+
     /**
      * Unsafe, throws error if failed. Use try_seek_async or seek_async unless you don't care about the result.
      */
     seek(new_time: number) {
         this.audio_element.currentTime = new_time
     }
+
     /**
     * Safer play_toggle_async. Normal play_toggle will try to start the player even if the track hasn't started yet, or was previously suspended/closed
+    * @throws Error if playback failed
     */
-    try_play_toggle_async() {
-        return new Promise((resolve, reject) => {
-            if (this.track.context.state !== "running") {
-                this.audio_context.resume().then(undefined, (e) =>
-                    reject(e))
-            }
-            if (this.audio_element.paused) {
-                this.audio_element.play().then((s) => {
-                    this.is_playing = true
-                    resolve(s)
-                }, (r) => {
-                    this.is_playing = false
-                    reject(r)
-                })
-            } else {
-                this.audio_element.pause()
+    async try_play_toggle() {
+        if (this.audio_context.state !== "running") {
+            await this.audio_context.resume()
+        }
+        if (this.audio_element.paused) {
+            try {
+                await this.audio_element.play()
+                this.is_playing = true
+            } catch (e) {
                 this.is_playing = false
-                resolve(null)
+                throw e
             }
-        })
+        } else {
+            this.audio_element.pause()
+            this.is_playing = false
+        }
     }
+
     /**
-     * Can try to play even if the audio context was suspended or closed. Best to use try_play_toggle_async()
-     */
-    play_toggle_async() {
-        return new Promise((resolve, reject) => {
-            if (this.track.context.state !== "running") {
-                this.audio_context.resume()
-            }
-            if (this.audio_element.paused) {
-                this.audio_element.play().then((s) => {
-                    this.is_playing = true
-                    resolve(s)
-                }, (r) => {
-                    this.is_playing = false
-                    reject(r)
-                })
-            } else {
-                this.audio_element.pause()
-                this.is_playing = false
-                resolve(null)
-            }
-        })
-    }
-    /**
-    * Unsafe, throws error if failed. Use play_toggle_async or try_play_toggle_async unless you don't care about the result.
+    * Unsafe, can just fail. Use try_play_toggle unless you don't care about the result.
     */
     play_toggle() {
         if (this.audio_element.paused) {
@@ -198,59 +175,37 @@ export class MusicPlayer {
             this.audio_element.pause()
         }
     }
+
     /**
-    * Safer play_async. Normal play will try to start the player even if the track hasn't started yet, or was previously suspended/closed
+    * Safer play. Normal play will try to start the player even if the track hasn't started yet, or was previously suspended/closed
+    * @throws Error if playback failed
     */
-    try_play_async() {
-        return new Promise((resolve, reject) => {
-            if (this.is_playing) resolve(Error("Already playing"))
-            if (this.track.context.state !== "running") {
-                this.audio_context.resume().then(() => {
-                    this.audio_element.play().then((s) => {
-                        this.is_playing = true
-                        resolve(s)
-                    }, (r) => {
-                        this.is_playing = false
-                        reject(r)
-                    })
-                }, (e) =>
-                    reject(new Error("Context closed or suspended" + JSON.stringify(e))))
-            } else {
-                this.audio_element.play().then((s) => {
-                    this.is_playing = true
-                    resolve(s)
-                }, (r) => {
-                    this.is_playing = false
-                    reject(r)
-                })
-            }
-        })
-    }
-    /**
-     * Will try to play even if the audio context was suspended or closed. Best to use try_play_async()
-     */
-    play_async() {
-        return new Promise((resolve, reject) => {
-            if (this.is_playing) resolve(Error("Already playing"))
-            this.audio_element.play().then((s) => {
+    async try_play() {
+        if (this.is_playing) return
+        if (this.audio_context.state !== "running") {
+            await this.audio_context.resume()
+        }
+        if (this.audio_element.paused) {
+            try {
+                await this.audio_element.play()
                 this.is_playing = true
-                resolve(s)
-            }, (r) => {
+            } catch (e) {
                 this.is_playing = false
-                reject(r)
-            })
-        })
+                throw e
+            }
+        }
     }
+
     /**
-    * Unsafe, throws error if failed. Use play_async or try_play_async unless you don't care about the result.
+    * Unsafe, can just fail. Use play_async or try_play_async unless you don't care about the result.
     */
     play() {
         if (this.is_playing) return
-        this.audio_element.play().catch((r) => {
+        this.audio_element.play().catch(() => {
             this.is_playing = false
-            throw r
         })
     }
+
     /**
      * Safe technically. Even if audioContext is suspended or closed it will pretend that it paused.
     */
@@ -258,35 +213,35 @@ export class MusicPlayer {
         this.audio_element.pause()
         this.is_playing = false
     }
+
     /**
      * Will only load metadata of the upcoming song. Need to call try_play_async() afterwards to start the playback
+     * @throws Error if adding element throwed Error or Stalled
      */
-    try_new_song_async(path: string) {
-        return new Promise((resolve, reject) => {
+    try_new_song(path: string) {
+        return new Promise<void>((resolve, reject) => {
             this.audio_element.src = this.current_song_path = path
             //Found out today about this. Such a nice new way to mass remove event listeners!
             const controller = new AbortController();
 
             this.audio_element.addEventListener("canplay", function canplay_listener(s) {
                 controller.abort()
-                resolve(s)
             }, { signal: controller.signal })
 
             this.audio_element.addEventListener("error", function error_listener(e) {
-                controller.abort()
-                reject(e)
+                controller.abort("new src error")
             }, { signal: controller.signal })
 
             this.audio_element.addEventListener("stalled", function stalled_listener(e) {
-                controller.abort()
-                reject(e)
+                controller.abort("new src stalled")
             }, { signal: controller.signal })
 
             //once aborted, try to set current_song_duration
-            controller.signal.addEventListener("abort", () => {
+            controller.signal.addEventListener("abort", (r) => {
                 this.current_song_duration = this.audio_element.duration
+                if (typeof controller.signal.reason == "string") reject(new Error(controller.signal.reason))
+                resolve()
             })
-
             this.is_playing = false
         })
     }
