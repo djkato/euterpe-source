@@ -363,7 +363,7 @@ export class MusicPlayerBuilder {
     constructor(private audio_element: HTMLAudioElement) {
         if (audio_element === undefined) throw Error("audio_element was undefined")
         //                                          ↓ For old browsers
-        const AudioContext = window.AudioContext;
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
         this.#audio_context = new AudioContext()
         this.#track = this.#audio_context.createMediaElementSource(audio_element)
         this.#gain = this.#audio_context.createGain()
