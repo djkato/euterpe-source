@@ -13,8 +13,15 @@
     <script type="module" src="/src/main.ts">
     </script>
     <div class="button-wrapper">
-        <button id="button">Analyze!</button>
-        <a id="download" href="">Download DB</a>
+        <button id="analyze">Analyze!</button>
+        <button id="create-svg">Create svgs!</button>
+        <div class="button-wrapper">
+            <div>
+                <input id="upload" type="file" />
+                <p>Upload DB</p>
+            </div>
+            <a id="download" href="">Download DB</a>
+        </div>
     </div>
     <div class="canvas-wrapper">
         <svg id="waveform-canvas" viewBox="0 0 500 500" preserveAspectRatio="none"></svg>

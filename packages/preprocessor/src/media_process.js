@@ -63,7 +63,7 @@ function generateNewVideoSizes(file, currentExtention, width_resolutions) {
     })
 }
 let dirs = filehound.create()
-    .path("../public/")
+    .path("../public/samples")
     .directory()
     .findSync()
 console.log(dirs)

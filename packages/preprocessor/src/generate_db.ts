@@ -3,7 +3,7 @@ import { songs } from "./songs_list"
 
 export function generate_db() {
     console.log(songs)
-    //construct db
+    // construct db
     let db = new DB
     let collections: string[] = new Array()
     let new_songs = []
@@ -38,11 +38,11 @@ export function generate_db() {
         const last_i = song.song.lastIndexOf("\\")
 
         const name = song.song.slice(last_i + 1)
-        const song_url = song.song.replace("\\\\", "/").slice(7)
+        const song_url = song.song.slice(song.song.indexOf("public\\") + 7)
         const db_song = new Song({
             name: name.slice(0, name.lastIndexOf(".")),
             artists: [],
-            url: new URL("http://localhost:4201/" + song_url),
+            url: new URL(`${window.location.href}${song_url}`.replaceAll("\\", "/")),
             duration: 0,
             remix_artists: [],
             in_collection: new Ref(RefTo.Collections, song.collection_id)

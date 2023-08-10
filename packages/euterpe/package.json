@@ -1,6 +1,6 @@
 {
   "name": "@euterpe.js/euterpe",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "type": "module",
   "description": "Fully featured solution for playing music on the web. Support for local library, audio visuals and more!",
   "main": "./src/index.js",

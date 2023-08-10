@@ -218,21 +218,28 @@ export class MusicPlayer {
      * Will only load metadata of the upcoming song. Need to call try_play_async() afterwards to start the playback
      * @throws Error if adding element throwed Error or Stalled
      */
-    try_new_song(path: string) {
+    async try_new_song(path: string) {
+        if (this.audio_context.state !== "running") {
+            try {
+                await this.audio_context.resume()
+            } catch (e) {
+                console.log("loading new song - couldn't resume context before hand", e)
+            }
+        }
         return new Promise<void>((resolve, reject) => {
             this.audio_element.src = this.current_song_path = path
             //Found out today about this. Such a nice new way to mass remove event listeners!
             const controller = new AbortController();
 
-            this.audio_element.addEventListener("canplay", function canplay_listener(s) {
+            this.audio_element.addEventListener("canplaythrough", function canplay_listener() {
                 controller.abort()
             }, { signal: controller.signal })
 
-            this.audio_element.addEventListener("error", function error_listener(e) {
+            this.audio_element.addEventListener("error", function error_listener() {
                 controller.abort("new src error")
             }, { signal: controller.signal })
 
-            this.audio_element.addEventListener("stalled", function stalled_listener(e) {
+            this.audio_element.addEventListener("stalled", function stalled_listener() {
                 controller.abort("new src stalled")
             }, { signal: controller.signal })
 

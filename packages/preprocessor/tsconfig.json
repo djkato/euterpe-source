@@ -24,6 +24,7 @@
     ]
   },
   "include": [
-    "src"
+    "src",
+    "src/media_process.js"
   ]
 }

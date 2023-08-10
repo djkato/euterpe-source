@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "crawl": "node crawler.mjs",
-    "process": "node crawler.mjs && vite",
+    "crawl": "cd src && node crawler.mjs",
+    "process": "npm run crawl && vite",
     "media-process": "cd src && node media_process.js",
     "serve": "vite",
     "build": "tsc && vite build",
