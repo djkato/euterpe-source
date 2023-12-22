@@ -9,7 +9,17 @@ import { execSync, exec } from 'child_process'
 import { fstat, unlinkSync } from "fs"
 
 function generate_new_photo_sizes(file, currentExtention) {
-    exec(`start ffmpeg -y -i "${file}.${currentExtention}" -lossless 0 -quality 85 -compression_level 6 -metadata author="Djkáťo" -metadata copyright="https://djkato.net" "${file}_ogw.webp" -vf scale=1000:-1 -lossless 0 -quality 85 -compression_level 6 -metadata author="Djkáťo" -metadata copyright="https://djkato.net" "${file}_1000w.webp" -vf scale=800:-1 -lossless 0 -quality 85 -compression_level 6 -metadata author="Djkáťo" -metadata copyright="https://djkato.net" "${file}_800w.webp" -vf scale=500:-1 -lossless 0 -quality 85 -compression_level 6 -metadata author="Djkáťo" -metadata copyright="https://djkato.net" "${file}_500w.webp" -vf scale=320:-1 -lossless 0 -quality 85 -compression_level 6 -metadata author="Djkáťo" -metadata copyright="https://djkato.net" "${file}_320w.webp" -vf scale=-1:64,gblur=sigma=10:steps=2 -lossless 0 -compression_level 6 -quality 85 -metadata author="Djkáťo" -metadata copyright="https://djkato.net" "${file}_placeholder.webp"`)
+    const path = file.substring(0, file.lastIndexOf("\\"))
+    file = file.substring(file.lastIndexOf("\\") + 1)
+    let command = ""
+    command += `cd "${path}" && start cmd /k "`
+    command += `ffmpeg -y -i "${file}.${currentExtention}" -lossless 0 -quality 90 -compression_level 6 "${file}_ogw.webp" `
+    command += ` -vf scale=1000:-1 -lossless 0 -quality 90 -compression_level 6 "${file}_1000p.webp"`
+    command += ` -vf scale=800:-1 -lossless 0 -quality 90 -compression_level 6 "${file}_800p.webp"`
+    command += ` -vf scale=500:-1 -lossless 0 -quality 90 -compression_level 6 "${file}_500p.webp"`
+    command += ` -vf scale=320:-1 -lossless 0 -quality 90 -compression_level 6 "${file}_320p.webp"`
+    command += ` && exit"`
+    exec(command)
 }
 function generate_new_anim_photo_sizes(file, currentExtention) {
     exec(`start ffmpeg -y -i "${file}.${currentExtention}" -lossless 0 -frames:v 1 -r 1 -quality 85 -compression_level 6 -metadata author="Djkáťo" -metadata copyright="https://djkato.net" "${file}_ogw_static.webp" -vf scale=1000:-1 -lossless 0 -frames:v 1 -r 1 -quality 85 -compression_level 6 -metadata author="Djkáťo" -metadata copyright="https://djkato.net" "${file}_1000w_static.webp" -vf scale=800:-1 -lossless 0 -frames:v 1 -r 1 -quality 85 -compression_level 6 -metadata author="Djkáťo" -metadata copyright="https://djkato.net" "${file}_800w_static.webp" -vf scale=500:-1 -lossless 0 -frames:v 1 -r 1 -quality 85 -compression_level 6 -metadata author="Djkáťo" -metadata copyright="https://djkato.net" "${file}_500w_static.webp" -vf scale=320:-1 -lossless 0 -frames:v 1 -r 1 -quality 85 -compression_level 6 -metadata author="Djkáťo" -metadata copyright="https://djkato.net" "${file}_320w_static.webp" -vf scale=-1:64,gblur=sigma=10:steps=2 -lossless 0 -frames:v 1 -r 1 -compression_level 6 -quality 85 -metadata author="Djkáťo" -metadata copyright="https://djkato.net" "${file}_placeholder_static.webp"`)
@@ -22,7 +32,11 @@ function generate_new_sounds_ogg(file, currentExtention) {
     let command = ""
     command += `cd "${path}" && start cmd /k "`
     command += `ffmpeg -y -i "${file}.${currentExtention}" `
-    command += `-c:a libopus -b:a 96k "${file}.ogg"`
+    //Adds 25ms of delay to all samples
+    command += `-af "adelay=25:all=true" `
+    //So the demo is HQ
+    if (file.includes("Luna Lenta")) command += `-c:a libopus -b:a 256k "${file}.ogg"`
+    else command += `-c:a libopus -b:a 96k "${file}.ogg"`
     command += ` && exit"`
     exec(command)
     // console.log(command)
@@ -34,12 +48,37 @@ function generate_new_sounds_mp3(file, currentExtention) {
     let command = ""
     command += `cd "${path}" && start cmd /k "`
     command += `ffmpeg -y -i "${file}.${currentExtention}" `
+    //Adds 25ms of delay to all samples
+    command += `-af "adelay=25:all=true" `
     command += `-b:a 160k "${file}.mp3"`
     command += ` && exit"`
     exec(command)
     // console.log(command)
 }
-function generateNewVideoSizes(file, currentExtention, width_resolutions) {
+function generate_new_video_sizes_mp4(file, currentExtention, width_resolutions) {
+    const path = file.substring(0, file.lastIndexOf("\\"))
+    file = file.substring(file.lastIndexOf("\\") + 1)
+
+    let command = ""
+    command += `cd "${path}" && `
+    command += `del ffmpeg2pass-0.log && `
+    command += `ffmpeg -y -i "${file}.${currentExtention}" `
+    command += `-vcodec libx264 -g 240 -b:v 3M `
+    command += `-pass 1 -f mp4 NUL && exit`
+
+    exec(command).once("exit", () => {
+        for (const resolution of width_resolutions) {
+            let res_command = ""
+            res_command += `start cmd /k "`
+            res_command += `cd "${path}" && `
+            res_command += `ffmpeg -y -i "${file}.${currentExtention}" `
+            res_command += `-vcodec libx264 -g 240 -b:v 3M -vf scale=${resolution}:-2 -pass 2 "${file}_${resolution}p.mp4"`
+            res_command += "&& exit\""
+            exec(res_command)
+        }
+    })
+}
+function generate_new_video_sizes_webm(file, currentExtention, width_resolutions) {
     const path = file.substring(0, file.lastIndexOf("\\"))
     file = file.substring(file.lastIndexOf("\\") + 1)
 
@@ -63,7 +102,7 @@ function generateNewVideoSizes(file, currentExtention, width_resolutions) {
     })
 }
 let dirs = filehound.create()
-    .path("../public/samples")
+    .path("../public/media")
     .directory()
     .findSync()
 console.log(dirs)
@@ -82,28 +121,29 @@ for (let i = 0; i < dirs.length; i++) {
         }
         for (let current_media of current_folder_files) {
             current_media = [current_media.substring(0, current_media.lastIndexOf(".")), current_media.substring(current_media.lastIndexOf(".") + 1)]
-            if (current_media[1] == "wav") {
+            if (current_media[1] == "wav" || current_media[1] == "mp3") {
                 console.log(`${current_media[0]}.${current_media[1]}\n`)
 
                 generate_new_sounds_ogg(`${current_media[0]}`, `${current_media[1]}`)
+                if (current_media[1] == "mp3") continue
                 generate_new_sounds_mp3(`${current_media[0]}`, `${current_media[1]}`)
             }
-            continue
+
+            if (current_media[1] == "webm" || current_media[1] == "mov" || current_media[1] == "avi" || current_media[1] == "mp4") {
+                if (/\_\d*p/.test(current_media[0])) continue
+                // console.log(`Video: ${current_media[0]}.${current_media[1]}\n`)
+                // generate_new_video_sizes_webm(`${current_media[0]}`, `${current_media[1]}`, [1440, 1080, 720, 480])
+                // generate_new_video_sizes_mp4(`${current_media[0]}`, `${current_media[1]}`, [1440, 1080, 720, 480])
+            }
             if (current_media[1] == "png" || current_media[1] == "jpg") {
                 console.log(`.\\${current_media[0]}.${current_media[1]}\n`)
 
                 generate_new_photo_sizes(`.\\${current_media[0]}`, `${current_media[1]}`)
             }
-            else if (current_media[1] == "gif") {
+            if (current_media[1] == "gif") {
                 console.log(`.\\${current_media[0]}.${current_media[1]}\n`)
 
                 generate_new_anim_photo_sizes(`.\\${current_media[0]}`, `${current_media[1]}`)
-            }
-            else if (current_media[1] == "webm" || current_media[1] == "mov" || current_media[1] == "avi" || current_media[1] == "mp4") {
-                console.log(`Video: ${current_media[0]}.${current_media[1]}\n`)
-
-                generateNewVideoSizes(`${current_media[0]}`, `${current_media[1]}`, [2560, 1080, 720, 480])
-
             }
         }
     }
