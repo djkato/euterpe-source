@@ -1,22 +1,15 @@
 {
-  "name": "@euterpe.js/preprocessor",
-  "private": true,
-  "version": "0.0.0",
+  "name": "euterpe-preprocessor",
+  "module": "src/index.ts",
   "type": "module",
   "scripts": {
-    "crawl": "cd src && node crawler.mjs",
-    "process": "npm run crawl && vite",
-    "media-process": "cd src && node media_process.js",
-    "serve": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
-  },
-  "devDependencies": {
-    "typescript": "^5.0.2",
-    "vite": "^4.4.0"
+    "dev": "bun run --hot src/index.ts"
   },
   "dependencies": {
-    "@euterpe.js/music-library": "*",
-    "filehound": "^1.17.6"
+    "hono": "^3.7.2",
+    "hyperimport": "^0.1.0"
+  },
+  "devDependencies": {
+    "bun-types": "^0.6.2"
   }
 }

@@ -1,70 +1,70 @@
 {
-  "name": "@euterpe.js/preprocessor",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "projectType": "application",
-  "sourceRoot": "packages/preprocessor/src",
-  "tags": [],
-  "targets": {
-    "build": {
-      "executor": "@nx/vite:build",
-      "outputs": [
-        "{options.outputPath}"
-      ],
-      "defaultConfiguration": "production",
-      "options": {
-        "outputPath": "dist/packages/preprocessor"
-      },
-      "configurations": {
-        "development": {
-          "mode": "development"
-        },
-        "production": {
-          "mode": "production"
-        }
-      }
-    },
-    "serve": {
-      "executor": "@nx/vite:dev-server",
-      "defaultConfiguration": "development",
-      "options": {
-        "buildTarget": "preprocessor:build"
-      },
-      "configurations": {
-        "development": {
-          "buildTarget": "preprocessor:build:development",
-          "hmr": true
-        },
-        "production": {
-          "buildTarget": "preprocessor:build:production",
-          "hmr": false
-        }
-      }
-    },
-    "preview": {
-      "executor": "@nx/vite:preview-server",
-      "defaultConfiguration": "development",
-      "options": {
-        "buildTarget": "preprocessor:build"
-      },
-      "configurations": {
-        "development": {
-          "buildTarget": "preprocessor:build:development"
-        },
-        "production": {
-          "buildTarget": "preprocessor:build:production"
-        }
-      }
-    },
-    "lint": {
-      "executor": "@nx/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
-      "options": {
-        "lintFilePatterns": [
-          "packages/preprocessor/**/*.ts"
-        ]
-      }
-    }
-  }
+	"name": "@euterpe.js/preprocessor",
+	"$schema": "../../node_modules/nx/schemas/project-schema.json",
+	"projectType": "application",
+	"sourceRoot": "packages/preprocessor/src",
+	"tags": [],
+	"targets": {
+		"build": {
+			"executor": "bun:build",
+			"outputs": [
+				"{options.outputPath}"
+			],
+			"defaultConfiguration": "production",
+			"options": {
+				"outputPath": "dist/packages/preprocessor"
+			},
+			"configurations": {
+				"development": {
+					"mode": "development"
+				},
+				"production": {
+					"mode": "production"
+				}
+			}
+		},
+		"serve": {
+			"executor": "bun:dev",
+			"defaultConfiguration": "development",
+			"options": {
+				"buildTarget": "preprocessor:build"
+			},
+			"configurations": {
+				"development": {
+					"buildTarget": "preprocessor:build:development",
+					"hmr": true
+				},
+				"production": {
+					"buildTarget": "preprocessor:build:production",
+					"hmr": false
+				}
+			}
+		},
+		"preview": {
+			"executor": "bun:start",
+			"defaultConfiguration": "development",
+			"options": {
+				"buildTarget": "preprocessor:build"
+			},
+			"configurations": {
+				"development": {
+					"buildTarget": "preprocessor:build:development"
+				},
+				"production": {
+					"buildTarget": "preprocessor:build:production"
+				}
+			}
+		},
+		"lint": {
+			"executor": "@nx/linter:eslint",
+			"outputs": [
+				"{options.outputFile}"
+			],
+			"options": {
+				"lintFilePatterns": [
+					"packages/preprocessor/**/*.ts"
+				]
+			}
+		}
+	}
 }

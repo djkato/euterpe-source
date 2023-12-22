@@ -1,0 +1,4 @@
+preload = ["./node_modules/hyperimport/preload.ts"]
+
+[hyperimport]
+loaders = ["rs"]
