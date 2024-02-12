@@ -20,14 +20,15 @@ class Euterpe extends MusicPlayer {
 		current_song_path?: string,
 		private options?: BuilderOptions
 	) {
-		super(
-			audio_context,
-			audio_element,
-			track,
-			gain,
-			volume,
-			current_song_path
-		)
+		super(audio_context, audio_element, track, gain, volume, current_song_path)
+
+		audio_element.addEventListener("ended", () => {
+			audio_element.currentTime = 0
+			audio_element.pause()
+			try {
+				this.try_next_song()
+			} catch (e) { }
+		})
 	}
 
 	/**
@@ -57,13 +58,10 @@ class Euterpe extends MusicPlayer {
 			while (this.db.songs[--id_i].id! > this.current_song_id);
 			const next_id = ++id_i
 
-			if (next_id == this.db.songs.length)
-				throw new Error("Won't go past the last song")
+			if (next_id == this.db.songs.length) throw new Error("Won't go past the last song")
 			new_song = this.db.songs.find((song) => song.id == next_id)!
 		}
-		const url = this.options?.use_only_pathname_url
-			? new_song.url.pathname
-			: new_song.url.toString()
+		const url = this.options?.use_only_pathname_url ? new_song.url.pathname : new_song.url.toString()
 		await this.try_new_song(url)
 		await this.try_play()
 		if (this.current_song) this.played_history.push(this.current_song)
@@ -87,9 +85,7 @@ class Euterpe extends MusicPlayer {
 			if (next_id == this.db.songs.length) next_id = this.db.songs[0].id!
 			new_song = this.db.songs.find((song) => song.id == next_id)!
 		}
-		const url = this.options?.use_only_pathname_url
-			? new_song.url.pathname
-			: new_song.url.toString()
+		const url = this.options?.use_only_pathname_url ? new_song.url.pathname : new_song.url.toString()
 		await this.try_new_song(url)
 		await this.try_play()
 		if (this.current_song) this.played_history.push(this.current_song)
@@ -113,9 +109,7 @@ class Euterpe extends MusicPlayer {
 			if (next_id == this.db.songs.length) next_id = this.db.songs[0].id!
 			new_song = this.db.songs.find((song) => song.id == next_id)!
 		}
-		const url = this.options?.use_only_pathname_url
-			? new_song.url.pathname
-			: new_song.url.toString()
+		const url = this.options?.use_only_pathname_url ? new_song.url.pathname : new_song.url.toString()
 		this.new_song(url)
 		this.play()
 		if (this.current_song) this.played_history.push(this.current_song)
@@ -137,9 +131,7 @@ class Euterpe extends MusicPlayer {
 			const next_id = ++id_i
 			new_song = this.db.songs.find((song) => song.id == next_id)!
 		}
-		const url = this.options?.use_only_pathname_url
-			? new_song.url.pathname
-			: new_song.url.toString()
+		const url = this.options?.use_only_pathname_url ? new_song.url.pathname : new_song.url.toString()
 		this.new_song(url)
 		this.play()
 		if (this.current_song) this.played_history.push(this.current_song)
@@ -168,9 +160,7 @@ class Euterpe extends MusicPlayer {
 	specific_song(new_song_id: number) {
 		const new_song = this.db.songs.find((song) => song.id! == new_song_id)
 		if (!new_song) return
-		const url = this.options?.use_only_pathname_url
-			? new_song.url.pathname
-			: new_song.url.toString()
+		const url = this.options?.use_only_pathname_url ? new_song.url.pathname : new_song.url.toString()
 		this.new_song(url)
 		this.play()
 		if (this.current_song) this.played_history.push(this.current_song)
@@ -192,13 +182,10 @@ class Euterpe extends MusicPlayer {
 			while (this.db.songs[++id_i].id! < this.current_song_id);
 			const next_id = --id_i
 
-			if (next_id == this.db.songs.length)
-				throw new Error("Won't roll backwards to last song")
+			if (next_id == this.db.songs.length) throw new Error("Won't roll backwards to last song")
 			new_song = this.db.songs.find((song) => song.id == next_id)!
 		}
-		const url = this.options?.use_only_pathname_url
-			? new_song.url.pathname
-			: new_song.url.toString()
+		const url = this.options?.use_only_pathname_url ? new_song.url.pathname : new_song.url.toString()
 		await this.try_new_song(url)
 		await this.try_play()
 		//if (this.current_song) this.played_history.push(this.current_song)
@@ -219,13 +206,10 @@ class Euterpe extends MusicPlayer {
 			while (this.db.songs[++id_i].id! < this.current_song_id);
 			let next_id = --id_i
 
-			if (next_id == -1)
-				next_id = this.db.songs[this.db.songs.length - 1].id!
+			if (next_id == -1) next_id = this.db.songs[this.db.songs.length - 1].id!
 			new_song = this.db.songs.find((song) => song.id == next_id)!
 		}
-		const url = this.options?.use_only_pathname_url
-			? new_song.url.pathname
-			: new_song.url.toString()
+		const url = this.options?.use_only_pathname_url ? new_song.url.pathname : new_song.url.toString()
 		await this.try_new_song(url)
 		await this.try_play()
 		//if (this.current_song) this.played_history.push(this.current_song)
@@ -246,13 +230,10 @@ class Euterpe extends MusicPlayer {
 			while (this.db.songs[++id_i].id! < this.current_song_id);
 			const next_id = -id_i
 
-			if (next_id == this.db.songs.length)
-				throw new Error("Won't go past the last song")
+			if (next_id == this.db.songs.length) throw new Error("Won't go past the last song")
 			new_song = this.db.songs.find((song) => song.id == next_id)!
 		}
-		const url = this.options?.use_only_pathname_url
-			? new_song.url.pathname
-			: new_song.url.toString()
+		const url = this.options?.use_only_pathname_url ? new_song.url.pathname : new_song.url.toString()
 		this.new_song(url)
 		this.play()
 		//if (this.current_song) this.played_history.push(this.current_song)
@@ -273,13 +254,10 @@ class Euterpe extends MusicPlayer {
 			while (this.db.songs[++id_i].id! < this.current_song_id);
 			let next_id = -id_i
 
-			if (next_id == this.db.songs.length)
-				next_id = this.db.songs[this.db.songs.length].id!
+			if (next_id == this.db.songs.length) next_id = this.db.songs[this.db.songs.length].id!
 			new_song = this.db.songs.find((song) => song.id == next_id)!
 		}
-		const url = this.options?.use_only_pathname_url
-			? new_song.url.pathname
-			: new_song.url.toString()
+		const url = this.options?.use_only_pathname_url ? new_song.url.pathname : new_song.url.toString()
 		this.new_song(url)
 		this.play()
 		//if (this.current_song) this.played_history.push(this.current_song)
@@ -341,8 +319,7 @@ class Euterpe extends MusicPlayer {
 	try_queue_add(id: number) {
 		const curr_song = this.db.songs.find((song) => song.id == id)
 		if (!curr_song) throw new Error(`Song of id "${id}" doesn't exist`)
-		if (this.queue.find((song) => song.id == id))
-			throw new Error(`Song of id "${id}" already queued`)
+		if (this.queue.find((song) => song.id == id)) throw new Error(`Song of id "${id}" already queued`)
 		this.queue.push(curr_song)
 	}
 	/**
@@ -391,18 +368,12 @@ class EuterpeBuilder {
 	 * will throw if audio_element is undefined (stupid vue setup amirite?)
 	 * will throw if user has not interacted with the page yet (Can't initiate AudioContext)
 	 */
-	constructor(
-		private audio_element: HTMLAudioElement,
-		private db: DB,
-		private options?: BuilderOptions
-	) {
-		if (audio_element === undefined)
-			throw Error("audio_element was undefined")
+	constructor(private audio_element: HTMLAudioElement, private db: DB, private options?: BuilderOptions) {
+		if (audio_element === undefined) throw Error("audio_element was undefined")
 		//                                          ↓ For old browsers
 		const AudioContext = window.AudioContext || window.webkitAudioContext
 		this.#audio_context = new AudioContext()
-		this.#track =
-			this.#audio_context.createMediaElementSource(audio_element)
+		this.#track = this.#audio_context.createMediaElementSource(audio_element)
 		this.#gain = this.#audio_context.createGain()
 	}
 	/**
@@ -411,9 +382,7 @@ class EuterpeBuilder {
 	 */
 	add_analyser() {
 		const analyser = this.#audio_context.createAnalyser()
-		!this.#prev_node
-			? this.#track.connect(analyser)
-			: this.#prev_node.connect(analyser)
+		!this.#prev_node ? this.#track.connect(analyser) : this.#prev_node.connect(analyser)
 		this.#prev_node = analyser
 		return analyser
 	}
@@ -423,9 +392,7 @@ class EuterpeBuilder {
 	 */
 	add_stereo_panner_node() {
 		const panner = this.#audio_context.createStereoPanner()
-		!this.#prev_node
-			? this.#track.connect(panner)
-			: this.#prev_node.connect(panner)
+		!this.#prev_node ? this.#track.connect(panner) : this.#prev_node.connect(panner)
 		this.#prev_node = panner
 		return panner
 	}
@@ -435,9 +402,7 @@ class EuterpeBuilder {
 	 */
 	add_wave_shaper_node() {
 		const shaper = this.#audio_context.createWaveShaper()
-		!this.#prev_node
-			? this.#track.connect(shaper)
-			: this.#prev_node.connect(shaper)
+		!this.#prev_node ? this.#track.connect(shaper) : this.#prev_node.connect(shaper)
 		this.#prev_node = shaper
 		return shaper
 	}
@@ -445,9 +410,7 @@ class EuterpeBuilder {
 	 * For additional trickery, you can connect your own node.
 	 */
 	connect_custom_node(node: AudioNode) {
-		!this.#prev_node
-			? this.#track.connect(node)
-			: this.#prev_node.connect(node)
+		!this.#prev_node ? this.#track.connect(node) : this.#prev_node.connect(node)
 		this.#prev_node = node
 	}
 	/**
@@ -455,9 +418,7 @@ class EuterpeBuilder {
 	 * eg. if you want the analyser nodes output to be affected by user #gain
 	 */
 	connect_gain() {
-		!this.#prev_node
-			? this.#track.connect(this.#gain)
-			: this.#prev_node.connect(this.#gain)
+		!this.#prev_node ? this.#track.connect(this.#gain) : this.#prev_node.connect(this.#gain)
 		this.#prev_node = this.#gain
 		this.#is_gain_connected = true
 	}
@@ -467,21 +428,10 @@ class EuterpeBuilder {
 	 */
 	build() {
 		if (!this.#is_gain_connected) {
-			!this.#prev_node
-				? this.#track.connect(this.#gain)
-				: this.#prev_node.connect(this.#gain)
+			!this.#prev_node ? this.#track.connect(this.#gain) : this.#prev_node.connect(this.#gain)
 			this.#prev_node = this.#gain
 		}
 		this.#prev_node.connect(this.#audio_context.destination)
-		return new Euterpe(
-			this.db,
-			this.#audio_context,
-			this.audio_element,
-			this.#track,
-			this.#gain,
-			this.#volume,
-			undefined,
-			this.options
-		)
+		return new Euterpe(this.db, this.#audio_context, this.audio_element, this.#track, this.#gain, this.#volume, undefined, this.options)
 	}
 }

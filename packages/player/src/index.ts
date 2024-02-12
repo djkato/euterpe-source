@@ -29,28 +29,19 @@ class PubSub {
 		switch (event_name) {
 			case SubscribeEvents.CurrentTimeTick: {
 				if (this.el_current_time_tick.includes(func)) {
-					this.el_current_time_tick.splice(
-						this.el_current_time_tick.indexOf(func),
-						1
-					)
+					this.el_current_time_tick.splice(this.el_current_time_tick.indexOf(func), 1)
 				}
 				break
 			}
 			case SubscribeEvents.FormattedDurationTick: {
 				if (this.el_formatted_duration_tick.includes(func)) {
-					this.el_formatted_duration_tick.splice(
-						this.el_formatted_duration_tick.indexOf(func),
-						1
-					)
+					this.el_formatted_duration_tick.splice(this.el_formatted_duration_tick.indexOf(func), 1)
 				}
 				break
 			}
 			case SubscribeEvents.FormattedCurrentTimeTick: {
 				if (this.el_formatted_duration_tick.includes(func)) {
-					this.el_formatted_duration_tick.splice(
-						this.el_formatted_duration_tick.indexOf(func),
-						1
-					)
+					this.el_formatted_duration_tick.splice(this.el_formatted_duration_tick.indexOf(func), 1)
 				}
 				break
 			}
@@ -114,10 +105,10 @@ export class MusicPlayer {
 	mute() {
 		this.#volume_cache = this.gain.gain.value
 		/* Gentler mute, doesn't pop
-        gain.gain.linearRampToValueAtTime(
-            0,
-            audio_context.currentTime + 0.1
-        );*/
+		gain.gain.linearRampToValueAtTime(
+			0,
+			audio_context.currentTime + 0.1
+		);*/
 		this.volume = this.gain.gain.value = 0
 	}
 	unmute() {
@@ -128,18 +119,14 @@ export class MusicPlayer {
 	}
 	/**
 	 * Safer seek_async. Normal seek will try to start the player even if the track hasn't started yet, or was previously suspended/closed.
-	 * Will also resume playback if player is paused (by finishing the song etc)
+	 * will not resume playback
 	 * @throws if "Can't seek - Audiocontext is not running"
 	 */
 	async try_seek(new_time: number) {
 		if (this.audio_context.state !== "running") {
 			this.is_playing = false
-			throw new Error(
-				"Can't seek - audioContext not running, audio_context.state : " +
-					this.audio_context.state
-			)
+			throw new Error("Can't seek - audioContext not running, audio_context.state : " + this.audio_context.state)
 		}
-		if (this.audio_element.paused) await this.try_play()
 		this.audio_element.currentTime = new_time
 	}
 
@@ -235,10 +222,7 @@ export class MusicPlayer {
 			try {
 				await this.audio_context.resume()
 			} catch (e) {
-				console.log(
-					"loading new song - couldn't resume context before hand",
-					e
-				)
+				console.log("loading new song - couldn't resume context before hand", e)
 			}
 		}
 		return new Promise<void>((resolve, reject) => {
@@ -273,8 +257,7 @@ export class MusicPlayer {
 			//once aborted, try to set current_song_duration
 			controller.signal.addEventListener("abort", (r) => {
 				this.current_song_duration = this.audio_element.duration
-				if (typeof controller.signal.reason == "string")
-					reject(new Error(controller.signal.reason))
+				if (typeof controller.signal.reason == "string") reject(new Error(controller.signal.reason))
 				resolve()
 			})
 			this.is_playing = false
@@ -341,24 +324,19 @@ export class MusicPlayer {
 		this.gain.gain.value = this.volume
 
 		this.time = this.audio_element.currentTime
-		if (this.#pub_sub.el_current_time_tick.length == 0)
-			cancelAnimationFrame(request_id)
+		if (this.#pub_sub.el_current_time_tick.length == 0) cancelAnimationFrame(request_id)
 		this.#pub_sub.emit(SubscribeEvents.CurrentTimeTick, this.time)
 	}
 	#emit_duration_fmt() {
-		const request_id = requestAnimationFrame(
-			this.#emit_duration_fmt.bind(this)
-		)
+		const request_id = requestAnimationFrame(this.#emit_duration_fmt.bind(this))
 		const time = this.get_formatted_duration()
-		if (this.#pub_sub.el_formatted_duration_tick.length == 0)
-			cancelAnimationFrame(request_id)
+		if (this.#pub_sub.el_formatted_duration_tick.length == 0) cancelAnimationFrame(request_id)
 		this.#pub_sub.emit(SubscribeEvents.FormattedDurationTick, time)
 	}
 	#emit_time_fmt() {
 		const request_id = requestAnimationFrame(this.#emit_time_fmt.bind(this))
 		const time = this.get_formatted_current_time()
-		if (this.#pub_sub.el_formatted_current_time_tick.length == 0)
-			cancelAnimationFrame(request_id)
+		if (this.#pub_sub.el_formatted_current_time_tick.length == 0) cancelAnimationFrame(request_id)
 		this.#pub_sub.emit(SubscribeEvents.FormattedCurrentTimeTick, time)
 	}
 	/**
@@ -373,10 +351,7 @@ export class MusicPlayer {
 	 * Will give formatted current time via get_formatted_current_time() every animation frame
 	 */
 	on_time_tick_formatted(callback: (data: any) => void) {
-		this.#pub_sub.subscribe(
-			SubscribeEvents.FormattedCurrentTimeTick,
-			callback
-		)
+		this.#pub_sub.subscribe(SubscribeEvents.FormattedCurrentTimeTick, callback)
 		this.#emit_time_fmt()
 	}
 	/**
@@ -401,13 +376,11 @@ export class MusicPlayerBuilder {
 	 * will throw if user has not interacted with the page yet (Can't initiate AudioContext)
 	 */
 	constructor(private audio_element: HTMLAudioElement) {
-		if (audio_element === undefined)
-			throw Error("audio_element was undefined")
+		if (audio_element === undefined) throw Error("audio_element was undefined")
 		//                                          ↓ For old browsers
 		const AudioContext = window.AudioContext || window.webkitAudioContext
 		this.#audio_context = new AudioContext()
-		this.#track =
-			this.#audio_context.createMediaElementSource(audio_element)
+		this.#track = this.#audio_context.createMediaElementSource(audio_element)
 		this.#gain = this.#audio_context.createGain()
 	}
 	/**
@@ -416,9 +389,7 @@ export class MusicPlayerBuilder {
 	 */
 	add_analyser() {
 		const analyser = this.#audio_context.createAnalyser()
-		!this.#prev_node
-			? this.#track.connect(analyser)
-			: this.#prev_node.connect(analyser)
+		!this.#prev_node ? this.#track.connect(analyser) : this.#prev_node.connect(analyser)
 		this.#prev_node = analyser
 		return analyser
 	}
@@ -428,9 +399,7 @@ export class MusicPlayerBuilder {
 	 */
 	add_stereo_panner_node() {
 		const panner = this.#audio_context.createStereoPanner()
-		!this.#prev_node
-			? this.#track.connect(panner)
-			: this.#prev_node.connect(panner)
+		!this.#prev_node ? this.#track.connect(panner) : this.#prev_node.connect(panner)
 		this.#prev_node = panner
 		return panner
 	}
@@ -440,9 +409,7 @@ export class MusicPlayerBuilder {
 	 */
 	add_wave_shaper_node() {
 		const shaper = this.#audio_context.createWaveShaper()
-		!this.#prev_node
-			? this.#track.connect(shaper)
-			: this.#prev_node.connect(shaper)
+		!this.#prev_node ? this.#track.connect(shaper) : this.#prev_node.connect(shaper)
 		this.#prev_node = shaper
 		return shaper
 	}
@@ -450,9 +417,7 @@ export class MusicPlayerBuilder {
 	 * For additional trickery, you can connect your own node.
 	 */
 	connect_custom_node(node: AudioNode) {
-		!this.#prev_node
-			? this.#track.connect(node)
-			: this.#prev_node.connect(node)
+		!this.#prev_node ? this.#track.connect(node) : this.#prev_node.connect(node)
 		this.#prev_node = node
 	}
 	/**
@@ -460,9 +425,7 @@ export class MusicPlayerBuilder {
 	 * eg. if you want the analyser nodes output to be affected by user #gain
 	 */
 	connect_gain() {
-		!this.#prev_node
-			? this.#track.connect(this.#gain)
-			: this.#prev_node.connect(this.#gain)
+		!this.#prev_node ? this.#track.connect(this.#gain) : this.#prev_node.connect(this.#gain)
 		this.#prev_node = this.#gain
 		this.#is_gain_connected = true
 	}
@@ -472,18 +435,10 @@ export class MusicPlayerBuilder {
 	 */
 	build() {
 		if (!this.#is_gain_connected) {
-			!this.#prev_node
-				? this.#track.connect(this.#gain)
-				: this.#prev_node.connect(this.#gain)
+			!this.#prev_node ? this.#track.connect(this.#gain) : this.#prev_node.connect(this.#gain)
 			this.#prev_node = this.#gain
 		}
 		this.#prev_node.connect(this.#audio_context.destination)
-		return new MusicPlayer(
-			this.#audio_context,
-			this.audio_element,
-			this.#track,
-			this.#gain,
-			this.#volume
-		)
+		return new MusicPlayer(this.#audio_context, this.audio_element, this.#track, this.#gain, this.#volume)
 	}
 }

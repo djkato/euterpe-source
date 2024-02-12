@@ -39,8 +39,7 @@ function generate_new_sounds_ogg(file, currentExtention) {
 	//Adds 25ms of delay to all samples
 	command += `-af 'adelay=25:all=true' `
 	//So the demo is HQ
-	if (file.includes("demo"))
-		command += `-c:a libopus -b:a 256k '${file}.ogg'"`
+	if (file.includes("demo")) command += `-c:a libopus -b:a 256k '${file}.ogg'"`
 	else command += `-c:a libopus -b:a 96k '${file}.ogg'"`
 	exec(command)
 	console.log(command)
@@ -59,11 +58,7 @@ function generate_new_sounds_mp3(file, currentExtention) {
 	exec(command)
 	// console.log(command)
 }
-function generate_new_video_sizes_mp4(
-	file,
-	currentExtention,
-	width_resolutions
-) {
+function generate_new_video_sizes_mp4(file, currentExtention, width_resolutions) {
 	const path = file.substring(0, file.lastIndexOf("\\"))
 	file = file.substring(file.lastIndexOf("\\") + 1)
 
@@ -86,11 +81,7 @@ function generate_new_video_sizes_mp4(
 		}
 	})
 }
-function generate_new_video_sizes_webm(
-	file,
-	currentExtention,
-	width_resolutions
-) {
+function generate_new_video_sizes_webm(file, currentExtention, width_resolutions) {
 	const path = file.substring(0, file.lastIndexOf("\\"))
 	file = file.substring(file.lastIndexOf("\\") + 1)
 
@@ -129,21 +120,12 @@ for (let i = 0; i < dirs.length; i++) {
 			current_folder_files = current_folder_files.slice(1)
 		}
 		for (let current_media of current_folder_files) {
-			current_media = [
-				current_media.substring(0, current_media.lastIndexOf(".")),
-				current_media.substring(current_media.lastIndexOf(".") + 1)
-			]
+			current_media = [current_media.substring(0, current_media.lastIndexOf(".")), current_media.substring(current_media.lastIndexOf(".") + 1)]
 			if (current_media[1] == "wav") {
 				console.log(`${current_media[0]}.${current_media[1]}\n`)
 
-				generate_new_sounds_ogg(
-					`${current_media[0]}`,
-					`${current_media[1]}`
-				)
-				generate_new_sounds_mp3(
-					`${current_media[0]}`,
-					`${current_media[1]}`
-				)
+				generate_new_sounds_ogg(`${current_media[0]}`, `${current_media[1]}`)
+				generate_new_sounds_mp3(`${current_media[0]}`, `${current_media[1]}`)
 			}
 
 			/*

@@ -88,16 +88,9 @@ export class AudioVisual {
 		} else {
 			this.#analyzer_node.getFloatFrequencyData(this.#fft_data)
 		}
-		const from = Math.round(
-			(this.#point_count / 100) * this.#from_fft_range
-		)
-		const to = Math.round(
-			this.#buffer_length -
-				(this.#buffer_length / 100) * this.#to_fft_range
-		)
-		const squeeze_factor = Math.round(
-			(this.#buffer_length - to) / this.#point_count
-		)
+		const from = Math.round((this.#point_count / 100) * this.#from_fft_range)
+		const to = Math.round(this.#buffer_length - (this.#buffer_length / 100) * this.#to_fft_range)
+		const squeeze_factor = Math.round((this.#buffer_length - to) / this.#point_count)
 
 		const return_array = new Array(this.#point_count)
 		for (let i = 0; i < this.#point_count + 1; i++) {
@@ -117,27 +110,16 @@ export class AudioVisual {
 			case ShapeType.Circle: {
 				const pointDistance = 7
 				for (let curPoint = 0; curPoint < arr.length; curPoint++) {
-					const [dx, dy] = this.#normalise_perpendicular_anchors(
-						arr[curPoint].x,
-						arr[curPoint].y
-					)
+					const [dx, dy] = this.#normalise_perpendicular_anchors(arr[curPoint].x, arr[curPoint].y)
 					const perpendicular = [-dy, dx]
 					anchors.push({
 						leftAnchor: {
-							x:
-								arr[curPoint].x +
-								pointDistance * perpendicular[0],
-							y:
-								arr[curPoint].y +
-								pointDistance * perpendicular[1]
+							x: arr[curPoint].x + pointDistance * perpendicular[0],
+							y: arr[curPoint].y + pointDistance * perpendicular[1]
 						},
 						rightAnchor: {
-							x:
-								arr[curPoint].x -
-								pointDistance * perpendicular[0],
-							y:
-								arr[curPoint].y -
-								pointDistance * perpendicular[1]
+							x: arr[curPoint].x - pointDistance * perpendicular[0],
+							y: arr[curPoint].y - pointDistance * perpendicular[1]
 						}
 					})
 				}
@@ -194,16 +176,7 @@ export class AudioVisual {
 			const cp2x = x2 - ((x3 - x1) / 6) * k
 			const cp2y = y2 - ((y3 - y1) / 6) * k
 
-			path +=
-				"C" +
-				[
-					cp1x.toFixed(2),
-					cp1y.toFixed(2),
-					cp2x.toFixed(2),
-					cp2y.toFixed(2),
-					x2.toFixed(2),
-					y2.toFixed(2)
-				]
+			path += "C" + [cp1x.toFixed(2), cp1y.toFixed(2), cp2x.toFixed(2), cp2y.toFixed(2), x2.toFixed(2), y2.toFixed(2)]
 		}
 		return path
 	}
@@ -217,16 +190,10 @@ export class AudioVisual {
 			case ShapeType.Line: {
 				for (let i = 0; i < frequency_data.length - 1; i++) {
 					const mutator = isFinite(frequency_data[i])
-						? this.#convert_range(
-								frequency_data[i] * this.#fft_multiplier +
-									this.#fft_offset,
-								in_range,
-								out_range
-						  )
+						? this.#convert_range(frequency_data[i] * this.#fft_multiplier + this.#fft_offset, in_range, out_range)
 						: -1 * this.#canvas_height
 					mutated_points.push({
-						x: this.#shape.points[i]
-							.x /** ((Math.max(FFTDataArray[i] + 100)) * 4)*/,
+						x: this.#shape.points[i].x /** ((Math.max(FFTDataArray[i] + 100)) * 4)*/,
 						y: this.#shape.points[i].y - mutator
 					})
 				}
@@ -234,30 +201,13 @@ export class AudioVisual {
 			}
 			case ShapeType.Circle: {
 				for (let i = 0; i < frequency_data.length - 1; i++) {
-					const new_i =
-						i > (frequency_data.length - 1) / 2
-							? frequency_data.length - 1 - i
-							: i
+					const new_i = i > (frequency_data.length - 1) / 2 ? frequency_data.length - 1 - i : i
 					mutated_points.push({
 						x:
-							this.#shape.points[i].x *
-								Math.max(
-									(frequency_data[new_i] *
-										this.#fft_multiplier +
-										this.#fft_offset) /
-										50,
-									1
-								) +
+							this.#shape.points[i].x * Math.max((frequency_data[new_i] * this.#fft_multiplier + this.#fft_offset) / 50, 1) +
 							this.#canvas_width / 2,
 						y:
-							this.#shape.points[i].y *
-								Math.max(
-									(frequency_data[new_i] *
-										this.#fft_multiplier +
-										this.#fft_offset) /
-										50,
-									1
-								) +
+							this.#shape.points[i].y * Math.max((frequency_data[new_i] * this.#fft_multiplier + this.#fft_offset) / 50, 1) +
 							this.#canvas_height / 2
 					})
 					/* TODO: IMPLEMENT SCALING TO BEAT
@@ -268,23 +218,12 @@ export class AudioVisual {
 				break
 			}
 			case ShapeType.Waveform: {
-				if (
-					this.#shape.waveform_options!.shape_type ==
-					WaveformShape.LineLike
-				) {
+				if (this.#shape.waveform_options!.shape_type == WaveformShape.LineLike) {
 					if (this.#shape.symmetry) {
 						for (let i = 0; i < this.#shape.points.length; i += 2) {
-							let mutator = this.#convert_range(
-								frequency_data[i / 2] * this.#fft_multiplier +
-									this.#fft_offset,
-								in_range,
-								out_range
-							)
+							let mutator = this.#convert_range(frequency_data[i / 2] * this.#fft_multiplier + this.#fft_offset, in_range, out_range)
 							if (mutator <= 0) mutator = 2
-							if (
-								this.#shape.waveform_options!.orientation ==
-								WaveformOrientation.Horizontal
-							) {
+							if (this.#shape.waveform_options!.orientation == WaveformOrientation.Horizontal) {
 								mutated_points.push({
 									x: this.#shape.points[i].x,
 									y: this.#shape.points[i].y - mutator
@@ -306,16 +245,8 @@ export class AudioVisual {
 						}
 					} else {
 						for (let i = 0; i < frequency_data.length - 1; i++) {
-							const mutator = this.#convert_range(
-								frequency_data[i] * this.#fft_multiplier +
-									this.#fft_offset,
-								in_range,
-								out_range
-							)
-							if (
-								this.#shape.waveform_options!.orientation ==
-								WaveformOrientation.Horizontal
-							) {
+							const mutator = this.#convert_range(frequency_data[i] * this.#fft_multiplier + this.#fft_offset, in_range, out_range)
+							if (this.#shape.waveform_options!.orientation == WaveformOrientation.Horizontal) {
 								mutated_points.push({
 									x: this.#shape.points[i].x,
 									y: this.#shape.points[i].y - mutator
@@ -363,36 +294,26 @@ export class AudioVisual {
 				switch (this.#shape.shape_type) {
 					case ShapeType.Line: {
 						for (let i = 0; i < arr.length; i++) {
-							path += `L ${arr[i].x.toFixed(2)},${arr[
-								i
-							].y.toFixed(2)} `
+							path += `L ${arr[i].x.toFixed(2)},${arr[i].y.toFixed(2)} `
 						}
 						if (this.#shape.shape_type == ShapeType.Line) {
-							path += `L ${this.#canvas_width} ${
-								this.#canvas_height
-							} `
+							path += `L ${this.#canvas_width} ${this.#canvas_height} `
 							//path += `L ${canvas_width} ${canvas_height} `
 						}
 						break
 					}
 					case ShapeType.Circle: {
 						for (let i = 0; i < arr.length; i++) {
-							path += `L ${arr[i].x.toFixed(2)},${arr[
-								i
-							].y.toFixed(2)} `
+							path += `L ${arr[i].x.toFixed(2)},${arr[i].y.toFixed(2)} `
 						}
 						break
 					}
 					case ShapeType.Waveform: {
 						for (let i = 0; i < arr.length; i += 2) {
-							path += `L ${arr[i].x.toFixed(2)},${arr[
-								i
-							].y.toFixed(2)} `
+							path += `L ${arr[i].x.toFixed(2)},${arr[i].y.toFixed(2)} `
 						}
 						for (let i = arr.length - 1; i >= 0; i -= 2) {
-							path += `L ${arr[i].x.toFixed(2)},${arr[
-								i
-							].y.toFixed(2)} `
+							path += `L ${arr[i].x.toFixed(2)},${arr[i].y.toFixed(2)} `
 						}
 					}
 				}
@@ -404,15 +325,9 @@ export class AudioVisual {
 				const anchors = this.#create_perpendicular_anchors(arr)
 
 				for (let i = 1; i < arr.length; i++) {
-					path += `C ${anchors[i - 1].rightAnchor.x.toFixed(
-						2
-					)} ${anchors[i - 1].rightAnchor.y.toFixed(2)} ${anchors[
+					path += `C ${anchors[i - 1].rightAnchor.x.toFixed(2)} ${anchors[i - 1].rightAnchor.y.toFixed(2)} ${anchors[
 						i
-					].leftAnchor.x.toFixed(2)} ${anchors[
-						i
-					].leftAnchor.y.toFixed(2)} ${arr[i].x.toFixed(2)} ${arr[
-						i
-					].y.toFixed(2)} `
+					].leftAnchor.x.toFixed(2)} ${anchors[i].leftAnchor.y.toFixed(2)} ${arr[i].x.toFixed(2)} ${arr[i].y.toFixed(2)} `
 				}
 				if (this.#shape.shape_type == ShapeType.Line) {
 					//path += `L ${this.canvasWidth} ${this.canvasHeight / 2} `
@@ -432,10 +347,7 @@ export class AudioVisual {
 				break
 			}
 			case SmoothingAlgorythm.CatmullRom: {
-				if (
-					this.#shape.shape_type == ShapeType.Waveform &&
-					this.#shape.symmetry == true
-				) {
+				if (this.#shape.shape_type == ShapeType.Waveform && this.#shape.symmetry == true) {
 					//adding points so both halfs ends and start at the same center point
 					console.log(arr)
 					const first_half = [{ x: 0, y: this.#canvas_height / 2 }]
@@ -500,10 +412,7 @@ export class AudioVisualBuilder {
 	#from_fft_range
 	#to_fft_range
 	#point_count: number
-	constructor(
-		analyzer_node: AnalyserNode,
-		svg_injecting_element: SVGSVGElement
-	) {
+	constructor(analyzer_node: AnalyserNode, svg_injecting_element: SVGSVGElement) {
 		this.#analyzer_node = analyzer_node
 		this.#svg_injecting_element = svg_injecting_element
 		this.#canvas_width = svg_injecting_element.viewBox.baseVal.width
@@ -515,10 +424,7 @@ export class AudioVisualBuilder {
 		this.#fft_offset = 150
 		this.#from_fft_range = 0
 		this.#to_fft_range = 100
-		this.#point_count = Math.round(
-			(this.#buffer_length / 100) *
-				(this.#from_fft_range - this.#to_fft_range)
-		)
+		this.#point_count = Math.round((this.#buffer_length / 100) * (this.#from_fft_range - this.#to_fft_range))
 	}
 	/**
 	 * The smoothingTimeConstant property of the AnalyserNode interface is a double value representing the averaging constant with the last analysis frame. It's basically an average between the current buffer and the last buffer the AnalyserNode processed, and results in a much smoother set of value changes over time.
@@ -537,8 +443,7 @@ export class AudioVisualBuilder {
 	 * @returns this
 	 */
 	set_fft_size(fft_size: number) {
-		if (!(this.#fft_size && !(this.#fft_size & (this.#fft_size - 1))))
-			throw Error("fft_size not power of two")
+		if (!(this.#fft_size && !(this.#fft_size & (this.#fft_size - 1)))) throw Error("fft_size not power of two")
 		this.#analyzer_node.fftSize = this.#fft_size = fft_size
 		this.#buffer_length = this.#analyzer_node.frequencyBinCount
 		return this
@@ -571,9 +476,7 @@ export class AudioVisualBuilder {
 	set_fft_data_tresholds({
 		from_fft_range_i = 0,
 		to_fft_range_i = 100,
-		point_count_i = Math.round(
-			(this.#buffer_length / 100) * (from_fft_range_i - to_fft_range_i)
-		),
+		point_count_i = Math.round((this.#buffer_length / 100) * (from_fft_range_i - to_fft_range_i)),
 		fft_multiplier_i = 2,
 		fft_offset_i = -50
 	}) {
@@ -614,11 +517,7 @@ export class AudioVisualBuilder {
 	 * @param shape_type Circle = 0; Line = 1;
 	 * @returns `new AudioVisual`
 	 */
-	build(
-		shape_type: ShapeType,
-		symmetry: boolean,
-		waveform_options?: WaveformOptions
-	) {
+	build(shape_type: ShapeType, symmetry: boolean, waveform_options?: WaveformOptions) {
 		const shape = this.#create_shape(shape_type, symmetry, waveform_options)
 		return new AudioVisual(
 			this.#analyzer_node,
@@ -632,11 +531,7 @@ export class AudioVisualBuilder {
 			this.#point_count
 		)
 	}
-	#create_shape(
-		shape_type: ShapeType,
-		symmetry: boolean,
-		waveform_options?: WaveformOptions
-	): Shape {
+	#create_shape(shape_type: ShapeType, symmetry: boolean, waveform_options?: WaveformOptions): Shape {
 		const point_amount = this.#get_cured_frequency_data().length
 		let new_shape: Shape
 		switch (shape_type) {
@@ -657,20 +552,11 @@ export class AudioVisualBuilder {
 			}
 			case ShapeType.Circle: {
 				const points = []
-				const radius =
-					this.#canvas_height > this.#canvas_width
-						? this.#canvas_height / 5
-						: this.#canvas_width / 5
+				const radius = this.#canvas_height > this.#canvas_width ? this.#canvas_height / 5 : this.#canvas_width / 5
 				for (let i = 0; i < point_amount; i++) {
 					points.push({
-						x:
-							Math.cos(
-								((2 * Math.PI) / point_amount) * i - Math.PI / 2
-							) * radius,
-						y:
-							Math.sin(
-								((2 * Math.PI) / point_amount) * i - Math.PI / 2
-							) * radius
+						x: Math.cos(((2 * Math.PI) / point_amount) * i - Math.PI / 2) * radius,
+						y: Math.sin(((2 * Math.PI) / point_amount) * i - Math.PI / 2) * radius
 					})
 				}
 
@@ -683,16 +569,10 @@ export class AudioVisualBuilder {
 			}
 			case ShapeType.Waveform: {
 				if (waveform_options === undefined) {
-					console.error(
-						"Waveform options undefined at shapetype.waveform, please define!"
-					)
-					throw Error(
-						"Waveform options undefined at shapetype.waveform, please define!"
-					)
+					console.error("Waveform options undefined at shapetype.waveform, please define!")
+					throw Error("Waveform options undefined at shapetype.waveform, please define!")
 				}
-				const fft_length = this.#get_cured_frequency_data(
-					waveform_options.fft_data
-				).length
+				const fft_length = this.#get_cured_frequency_data(waveform_options.fft_data).length
 				const points = []
 				for (let i = 0; i < fft_length; i++) {
 					let x, y
@@ -702,16 +582,10 @@ export class AudioVisualBuilder {
 					} else {
 						throw Error("WaveformShape.Striped not implemented yet")
 					}
-					waveform_options.orientation ==
-					WaveformOrientation.Horizontal
-						? points.push({ x: x, y: y })
-						: points.push({ x: y, y: x })
+					waveform_options.orientation == WaveformOrientation.Horizontal ? points.push({ x: x, y: y }) : points.push({ x: y, y: x })
 					//Douple the points needed for symmetry
 					if (symmetry) {
-						waveform_options.orientation ==
-						WaveformOrientation.Horizontal
-							? points.push({ x: x, y: y })
-							: points.push({ x: y, y: x })
+						waveform_options.orientation == WaveformOrientation.Horizontal ? points.push({ x: x, y: y }) : points.push({ x: y, y: x })
 					}
 				}
 				new_shape = {
@@ -731,16 +605,9 @@ export class AudioVisualBuilder {
 			fft_data = new Float32Array(this.#buffer_length)
 			this.#analyzer_node.getFloatFrequencyData(fft_data)
 		}
-		const from = Math.round(
-			(this.#point_count / 100) * this.#from_fft_range
-		)
-		const to = Math.round(
-			this.#buffer_length -
-				(this.#buffer_length / 100) * this.#to_fft_range
-		)
-		const squeezeFactor = Math.round(
-			(this.#buffer_length - to) / this.#point_count
-		)
+		const from = Math.round((this.#point_count / 100) * this.#from_fft_range)
+		const to = Math.round(this.#buffer_length - (this.#buffer_length / 100) * this.#to_fft_range)
+		const squeezeFactor = Math.round((this.#buffer_length - to) / this.#point_count)
 
 		const return_array = new Array(this.#point_count)
 		for (let i = 0; i < this.#point_count; i++) {

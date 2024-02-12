@@ -3,16 +3,12 @@ import { EuterpeBuilder } from "@euterpe.js/euterpe"
 
 let is_seeking = false
 // document.addEventListener("click", start, { once: true })
-const euterpe = new EuterpeBuilder(
-	document.querySelector("#audio")!,
-	db
-).build()
+const euterpe = new EuterpeBuilder(document.querySelector("#audio")!, db).build()
 add_library_to_dom()
 
 euterpe.try_preload_song(0).then(
 	() => {
-		document.querySelector("#text-playing")!.innerHTML =
-			euterpe.format_current_song()
+		document.querySelector("#text-playing")!.innerHTML = euterpe.format_current_song()
 	},
 	(e) => console.log(e + " Failed to preload")
 )
@@ -46,8 +42,7 @@ euterpe.on_time_tick((time) => {
 document.querySelector("#previous")?.addEventListener("click", () => {
 	euterpe.try_previous_song_looping().then(
 		() => {
-			document.querySelector("#text-playing")!.innerHTML =
-				euterpe.format_current_song()
+			document.querySelector("#text-playing")!.innerHTML = euterpe.format_current_song()
 		},
 		(e) => alert(e + "Failed to change song")
 	)
@@ -55,8 +50,7 @@ document.querySelector("#previous")?.addEventListener("click", () => {
 document.querySelector("#next")?.addEventListener("click", () => {
 	euterpe.try_next_song_looping().then(
 		() => {
-			document.querySelector("#text-playing")!.innerHTML =
-				euterpe.format_current_song()
+			document.querySelector("#text-playing")!.innerHTML = euterpe.format_current_song()
 		},
 		(e) => alert(e + "Failed to change song")
 	)
@@ -78,9 +72,7 @@ document.querySelector("#toggle-mute")?.addEventListener("click", () => {
 	euterpe.mute_toggle()
 })
 document.querySelector("#toggle-play")?.addEventListener("click", () => {
-	euterpe
-		.try_play_toggle()
-		.catch((e) => alert("failed to toggle pause/play!" + e))
+	euterpe.try_play_toggle().catch((e) => alert("failed to toggle pause/play!" + e))
 })
 document.querySelector("#volume")?.addEventListener("input", (e) => {
 	euterpe.change_volume(e.target?.valueAsNumber)
@@ -119,9 +111,7 @@ function add_library_to_dom() {
 function library_play(e: MouseEvent) {
 	const b = e.currentTarget as HTMLButtonElement
 	euterpe.try_specific_song(parseInt(b.dataset["id"]!)).then(
-		() =>
-			(document.querySelector("#text-playing")!.innerHTML =
-				euterpe.format_current_song()),
+		() => (document.querySelector("#text-playing")!.innerHTML = euterpe.format_current_song()),
 		(e) => alert(e)
 	)
 }

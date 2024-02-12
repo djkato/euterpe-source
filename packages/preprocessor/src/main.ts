@@ -1,12 +1,6 @@
 import { DB, from_json } from "@euterpe.js/music-library"
 import { generate_db } from "./generate_db"
-import {
-	AudioVisualBuilder,
-	SmoothingAlgorythm,
-	ShapeType,
-	WaveformOrientation,
-	WaveformShape
-} from "@euterpe.js/visualizer"
+import { AudioVisualBuilder, SmoothingAlgorythm, ShapeType, WaveformOrientation, WaveformShape } from "@euterpe.js/visualizer"
 
 let result: AnalyzeReturn | undefined
 
@@ -23,10 +17,7 @@ audioContextAnalyser.smoothingTimeConstant = 0
 const analyserBufferLength = audioContextAnalyser.frequencyBinCount
 const FFTDataArray = new Float32Array(analyserBufferLength)
 //Connect all audio Nodes
-track
-	.connect(audioContextAnalyser)
-	.connect(gain)
-	.connect(audioContext.destination)
+track.connect(audioContextAnalyser).connect(gain).connect(audioContext.destination)
 
 document.getElementById("analyze")!.addEventListener("click", async (ev) => {
 	audioContext.resume()
@@ -50,11 +41,7 @@ document.getElementById("upload")!.addEventListener("change", (ev) => {
 		for (const song of new_db.songs) {
 			if (song.fft_data) {
 				for (let i = 0; i < song.fft_data.length; i++) {
-					if (
-						song.fft_data[i] === null ||
-						song.fft_data[i] === undefined
-					)
-						song.fft_data[i] = -Infinity
+					if (song.fft_data[i] === null || song.fft_data[i] === undefined) song.fft_data[i] = -Infinity
 				}
 			}
 		}
@@ -68,26 +55,18 @@ async function svg() {
 		return
 	}
 	console.log("Creating svgs...")
-	const canvas_wrapper = document.querySelector(
-		".canvas-wrapper"
-	) as HTMLElement
+	const canvas_wrapper = document.querySelector(".canvas-wrapper") as HTMLElement
 
-	const waveform_canvas = document
-		.querySelector("#waveform-canvas")
-		?.cloneNode() as SVGSVGElement
+	const waveform_canvas = document.querySelector("#waveform-canvas")?.cloneNode() as SVGSVGElement
 
 	canvas_wrapper.childNodes.forEach((c) => c.remove())
 	canvas_wrapper.appendChild(waveform_canvas)
 
 	for (const song of result.db.songs) {
 		console.log("creating waveform for -> " + song.name)
-		const curr_waveform_canvas =
-			waveform_canvas.cloneNode() as SVGSVGElement
+		const curr_waveform_canvas = waveform_canvas.cloneNode() as SVGSVGElement
 		waveform_canvas.parentElement?.append(curr_waveform_canvas)
-		const waveform_visual_builder = new AudioVisualBuilder(
-			result.analyzer_node,
-			curr_waveform_canvas
-		)
+		const waveform_visual_builder = new AudioVisualBuilder(result.analyzer_node, curr_waveform_canvas)
 			.set_fft_data_tresholds({
 				point_count_i: 100,
 				fft_multiplier_i: 0.9,
@@ -95,15 +74,11 @@ async function svg() {
 			})
 			.set_fft_time_smoothing(0.8)
 			.set_smoothing_algorythm(SmoothingAlgorythm.CatmullRom)
-		const waveform_visual = waveform_visual_builder.build(
-			ShapeType.Waveform,
-			true,
-			{
-				fft_data: new Float32Array(new Float64Array(song.fft_data!)),
-				orientation: WaveformOrientation.Horizontal,
-				shape_type: WaveformShape.LineLike
-			}
-		)
+		const waveform_visual = waveform_visual_builder.build(ShapeType.Waveform, true, {
+			fft_data: new Float32Array(new Float64Array(song.fft_data!)),
+			orientation: WaveformOrientation.Horizontal,
+			shape_type: WaveformShape.LineLike
+		})
 		waveform_visual.draw_once()
 		// await new Promise<void>((done) => setTimeout(() => done(), 500))
 		// @ts-ignore
@@ -125,21 +100,13 @@ async function analyze(): Promise<AnalyzeReturn> {
 	console.log(db)
 	for (const song of db.songs) {
 		// const song = db.songs[db.songs.length - 1]
-		console.log(
-			`Analyzing ${song.name}, ${db.songs.indexOf(song) + 1}/${
-				db.songs.length
-			}`
-		)
+		console.log(`Analyzing ${song.name}, ${db.songs.indexOf(song) + 1}/${db.songs.length}`)
 		//if not loaded yet keep trying
 		audioEl.src = song.url.href
 		await awaitLoad(audioEl)
 		song.duration = audioEl.duration
 		let currentFFTData = []
-		for (
-			let curSecond = 0;
-			curSecond < song.duration;
-			curSecond += song.duration / samplingRate
-		) {
+		for (let curSecond = 0; curSecond < song.duration; curSecond += song.duration / samplingRate) {
 			console.log("working...")
 			audioEl.currentTime = curSecond
 			await audioEl.play()
@@ -149,9 +116,7 @@ async function analyze(): Promise<AnalyzeReturn> {
 			FFTDataArray.forEach((element) => {
 				volume += element
 			})
-			currentFFTData.push(
-				Math.round((volume / FFTDataArray.length) * 100) / 100
-			)
+			currentFFTData.push(Math.round((volume / FFTDataArray.length) * 100) / 100)
 		}
 		song.fft_data = currentFFTData
 		console.log(song.fft_data)

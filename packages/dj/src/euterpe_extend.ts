@@ -11,22 +11,13 @@ class DJ {
 	/**in ms */
 	beat_duration?: number
 	beat = { current: 0, max: 4, next_bar_in: 4 }
-	on_beat?: (beat: {
-		current: number
-		max: number
-		next_bar_in: number
-	}) => void
-	constructor(
-		public player: Euterpe | MusicPlayer,
-		public master_bpm: number | 120
-	) {
+	on_beat?: (beat: { current: number; max: number; next_bar_in: number }) => void
+	constructor(public player: Euterpe | MusicPlayer, public master_bpm: number | 120) {
 		this.beat_duration = 60 / master_bpm
 		this.#emit_beats()
 	}
 	#emit_beats() {
-		this.beat.current >= 4
-			? (this.beat.current++, this.beat.next_bar_in--)
-			: ((this.beat.current = 0), (this.beat.next_bar_in = this.beat.max))
+		this.beat.current >= 4 ? (this.beat.current++, this.beat.next_bar_in--) : ((this.beat.current = 0), (this.beat.next_bar_in = this.beat.max))
 
 		if (this.on_beat) this.on_beat(this.beat)
 		//This makes it break if BPM >= 300!!!!
@@ -92,17 +83,10 @@ class Track {
 	gain: GainNode
 	audio_context: AudioContext | BaseAudioContext
 
-	constructor(
-		public player: MusicPlayer | Euterpe,
-		public current_song?: Song,
-		public should_loop?: boolean
-	) {
+	constructor(public player: MusicPlayer | Euterpe, public current_song?: Song, public should_loop?: boolean) {
 		this.audio_context = player.audio_context
 		this.gain = this.audio_context.createGain()
-		if (current_song)
-			this.change_song(current_song).catch((e) =>
-				console.error("error during track construction - " + e)
-			)
+		if (current_song) this.change_song(current_song).catch((e) => console.error("error during track construction - " + e))
 	}
 
 	async #prepare() {
@@ -110,10 +94,7 @@ class Track {
 			if (!this.current_song) reject(new Error("No current song"))
 			fetch(this.current_song!.url).then(
 				async (file) => {
-					this.audio_buffer =
-						await this.audio_context.decodeAudioData(
-							await file.arrayBuffer()
-						)
+					this.audio_buffer = await this.audio_context.decodeAudioData(await file.arrayBuffer())
 					resolve(this)
 				},
 				(reason) => reject(reason)
@@ -121,10 +102,7 @@ class Track {
 		})
 	}
 	#connect() {
-		if (!this.audio_buffer)
-			throw new Error(
-				"Somehow buffer not in track even though it analyzed properly. Report this as a bug"
-			)
+		if (!this.audio_buffer) throw new Error("Somehow buffer not in track even though it analyzed properly. Report this as a bug")
 		this.buffer_source = this.audio_context.createBufferSource()
 		this.buffer_source.buffer = this.audio_buffer!
 		this.buffer_source.connect(this.gain)
@@ -149,11 +127,8 @@ class Track {
 	 */
 	async try_start(delay?: number) {
 		return new Promise((resolve, reject) => {
-			if (!this.buffer_source)
-				reject(new Error("No buffer source yet, set a song first"))
-			this.buffer_source!.start(
-				this.audio_context.currentTime + (delay || 0)
-			)
+			if (!this.buffer_source) reject(new Error("No buffer source yet, set a song first"))
+			this.buffer_source!.start(this.audio_context.currentTime + (delay || 0))
 		})
 	}
 }

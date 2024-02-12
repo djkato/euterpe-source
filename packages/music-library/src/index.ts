@@ -1,14 +1,4 @@
-export {
-	RefTo,
-	Ref,
-	Song,
-	Collection,
-	DB,
-	Artist,
-	Platforms,
-	CollectionType,
-	from_json
-}
+export { RefTo, Ref, Song, Collection, DB, Artist, Platforms, CollectionType, from_json }
 type ID = number
 enum RefTo {
 	Artists,
@@ -179,9 +169,7 @@ class DB {
 	add(artist: Artist[]): void
 	add(collection: Collection[]): void
 	add(mix: (Song | Artist | Collection)[]): void
-	add(
-		stuff: Artist[] | Collection[] | Song[] | (Song | Artist | Collection)[]
-	) {
+	add(stuff: Artist[] | Collection[] | Song[] | (Song | Artist | Collection)[]) {
 		/** All of this adds refrences to the other side of whatever is being added.
 		 *  eg. adding song with refrence to artist, adds refrence of song to artist
 		 * and adds incremental ids
@@ -217,9 +205,7 @@ class DB {
 				}
 				for (const artist_ref of col.artists) {
 					const curr_artist = artist_ref.get(this) as Artist
-					curr_artist.collections.push(
-						new Ref(RefTo.Collections, col.id)
-					)
+					curr_artist.collections.push(new Ref(RefTo.Collections, col.id))
 				}
 				this.collections.push(col)
 			} else if (input instanceof Song) {
@@ -229,16 +215,8 @@ class DB {
 				if (song.in_collection) {
 					const curr_col = song.in_collection.get(this) as Collection
 					curr_col.songs.push(new Ref(RefTo.Songs, song.id))
-					song.artists.forEach((artist) =>
-						curr_col.artists.push(
-							new Ref(RefTo.Artists, artist.get(this)!.id!)
-						)
-					)
-					song.remix_artists.forEach((artist) =>
-						curr_col.artists.push(
-							new Ref(RefTo.Artists, artist.get(this)!.id!)
-						)
-					)
+					song.artists.forEach((artist) => curr_col.artists.push(new Ref(RefTo.Artists, artist.get(this)!.id!)))
+					song.remix_artists.forEach((artist) => curr_col.artists.push(new Ref(RefTo.Artists, artist.get(this)!.id!)))
 				}
 
 				for (const artist_ref of song.artists) {
@@ -258,20 +236,12 @@ class DB {
 		this.artists.sort((a, b) => a.id! - b.id!)
 	}
 }
-function from_json(db_stringified: {
-	artists?: any
-	songs?: any
-	collections?: any
-}): DB {
+function from_json(db_stringified: { artists?: any; songs?: any; collections?: any }): DB {
 	const db = new DB()
 	if (db_stringified.artists) {
 		for (const artist of db_stringified.artists) {
-			if (artist.songs)
-				artist.songs = artist.songs.map((e: any) => ref_from_json(e))
-			if (artist.collections)
-				artist.collections = artist.collections.map((e: any) =>
-					ref_from_json(e)
-				)
+			if (artist.songs) artist.songs = artist.songs.map((e: any) => ref_from_json(e))
+			if (artist.collections) artist.collections = artist.collections.map((e: any) => ref_from_json(e))
 			if (artist.links)
 				artist.links = artist.links.map((e: any) => {
 					try {
@@ -280,8 +250,7 @@ function from_json(db_stringified: {
 						console.log(e)
 					}
 				})
-			if (artist.publish_date)
-				artist.publish_date = new Date(JSON.parse(artist.publish_date))
+			if (artist.publish_date) artist.publish_date = new Date(JSON.parse(artist.publish_date))
 			if (artist.id) artist.id = artist.id as ID
 			try {
 				if (artist.pfp) artist.pfp = new URL(artist.pfp)
@@ -298,22 +267,16 @@ function from_json(db_stringified: {
 			} catch (e) {
 				console.error("failed to parse song.url" + e)
 			}
-			if (song.artists)
-				song.artists = song.artists.map((e: any) => ref_from_json(e))
-			if (song.remix_artists)
-				song.remix_artists = song.remix_artists.map((e: any) =>
-					ref_from_json(e)
-				)
-			if (song.in_collection)
-				song.in_collection = ref_from_json(song.in_collection)
+			if (song.artists) song.artists = song.artists.map((e: any) => ref_from_json(e))
+			if (song.remix_artists) song.remix_artists = song.remix_artists.map((e: any) => ref_from_json(e))
+			if (song.in_collection) song.in_collection = ref_from_json(song.in_collection)
 			try {
 				if (song.cover) song.cover = new URL(song.cover)
 			} catch (e) {
 				console.error(e), console.error("failed to parse artist URL")
 			}
 			try {
-				if (song.publish_date)
-					song.publish_date = new Date(JSON.parse(song.publish_date))
+				if (song.publish_date) song.publish_date = new Date(JSON.parse(song.publish_date))
 			} catch (e) {
 				console.error(e), console.error("Failed to song cover url")
 			}
@@ -323,32 +286,18 @@ function from_json(db_stringified: {
 	}
 	if (db_stringified.collections) {
 		for (const collection of db_stringified.collections) {
-			if (collection.artists)
-				collection.artists = collection.artists.map((e: any) =>
-					ref_from_json(e)
-				)
-			if (collection.songs)
-				collection.songs = collection.songs.map((e: any) =>
-					ref_from_json(e)
-				)
-			if (collection.type)
-				collection.type = collection.type.map(
-					(e: any) => e as CollectionType
-				)
+			if (collection.artists) collection.artists = collection.artists.map((e: any) => ref_from_json(e))
+			if (collection.songs) collection.songs = collection.songs.map((e: any) => ref_from_json(e))
+			if (collection.type) collection.type = collection.type.map((e: any) => e as CollectionType)
 			try {
-				if (collection.publish_date)
-					collection.publish_date = new Date(
-						JSON.parse(collection.publish_date)
-					)
+				if (collection.publish_date) collection.publish_date = new Date(JSON.parse(collection.publish_date))
 			} catch (e) {
 				console.error(e), console.error("Failed to parse date")
 			}
 			try {
-				if (collection.cover)
-					collection.cover = new URL(collection.cover)
+				if (collection.cover) collection.cover = new URL(collection.cover)
 			} catch (e) {
-				console.error(e),
-					console.error("failed to parse collection cover url")
+				console.error(e), console.error("failed to parse collection cover url")
 			}
 			if (collection.id) collection.id = collection.id as ID
 			db.collections.push(collection)
