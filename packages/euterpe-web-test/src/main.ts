@@ -3,15 +3,12 @@ import { EuterpeBuilder } from "@euterpe.js/euterpe"
 
 let is_seeking = false
 // document.addEventListener("click", start, { once: true })
-const euterpe = new EuterpeBuilder(document.querySelector("#audio")!, db).build()
+const euterpe = new EuterpeBuilder(document.querySelector("#audio")!, db, {
+	auto_play_after_seek: true,
+	auto_play_after_changing_song: true,
+	use_only_pathname_url: true
+}).build()
 add_library_to_dom()
-
-euterpe.try_preload_song(0).then(
-	() => {
-		document.querySelector("#text-playing")!.innerHTML = euterpe.format_current_song()
-	},
-	(e) => console.log(e + " Failed to preload")
-)
 
 document.querySelector("#seek")?.addEventListener("mouseup", (e) => {
 	try {
@@ -23,7 +20,7 @@ document.querySelector("#seek")?.addEventListener("mouseup", (e) => {
 	is_seeking = false
 })
 
-// Subscriptions to AudioContext changes, eg. time..
+// Subscriptions to song and AudioContext changes, eg. time, name..
 euterpe.on_duration_formatted((time) => {
 	document.querySelector("#duration")!.innerHTML = time
 	document.querySelector("#seek")!.max = "" + euterpe.current_song_duration
@@ -32,6 +29,7 @@ euterpe.on_duration_formatted((time) => {
 euterpe.on_time_tick_formatted((time) => {
 	document.querySelector("#current")!.innerHTML = time
 })
+
 euterpe.on_time_tick((time) => {
 	if (is_seeking) return
 	document.querySelector("#seek")!.value = "" + time
@@ -39,44 +37,49 @@ euterpe.on_time_tick((time) => {
 	dev_history_update()
 })
 
-document.querySelector("#previous")?.addEventListener("click", () => {
-	euterpe.try_previous_song_looping().then(
-		() => {
-			document.querySelector("#text-playing")!.innerHTML = euterpe.format_current_song()
-		},
-		(e) => alert(e + "Failed to change song")
-	)
+euterpe.on_song_change((_, song_name) => {
+	document.querySelector("#text-playing")!.innerHTML = song_name
 })
+
+//preload after setting all listeners to make sure you capture the song update!
+euterpe.try_preload_song(0).catch((e) => console.log(e + " Failed to preload"))
+
+document.querySelector("#previous")?.addEventListener("click", () => {
+	euterpe.try_previous_song_looping().catch((e) => alert(e + "Failed to change song"))
+})
+
 document.querySelector("#next")?.addEventListener("click", () => {
-	euterpe.try_next_song_looping().then(
-		() => {
-			document.querySelector("#text-playing")!.innerHTML = euterpe.format_current_song()
-		},
-		(e) => alert(e + "Failed to change song")
-	)
+	euterpe.try_next_song_looping().catch((e) => alert(e + "Failed to change song"))
 })
 
 document.querySelector("#play")?.addEventListener("click", () => {
 	euterpe.try_play().catch((e) => alert("Failed to play, " + e))
 })
+
 document.querySelector("#pause")?.addEventListener("click", () => {
 	euterpe.pause()
 })
+
 document.querySelector("#mute")?.addEventListener("click", () => {
 	euterpe.mute()
 })
+
 document.querySelector("#unmute")?.addEventListener("click", () => {
 	euterpe.unmute()
 })
+
 document.querySelector("#toggle-mute")?.addEventListener("click", () => {
 	euterpe.mute_toggle()
 })
+
 document.querySelector("#toggle-play")?.addEventListener("click", () => {
 	euterpe.try_play_toggle().catch((e) => alert("failed to toggle pause/play!" + e))
 })
+
 document.querySelector("#volume")?.addEventListener("input", (e) => {
 	euterpe.change_volume(e.target?.valueAsNumber)
 })
+
 //disables time updates so the time slider doesn't slip away from user
 document.querySelector("#seek")?.addEventListener("mousedown", () => {
 	is_seeking = true

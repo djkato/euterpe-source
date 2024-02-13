@@ -1,3 +1,4 @@
+//To see how to get these, check the preprocessor repo!
 export const fft_data = {
 	fft_data: [
 		-106.24, -99.73, -100.98, -101.34, -107.01, -92.38, -84.85, -90.28, -93.68, -95.02, -97.16, -96.32, -99.23, -103.13, -85.57, -98.17, -103.27,

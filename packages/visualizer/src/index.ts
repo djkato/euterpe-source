@@ -9,9 +9,9 @@ export enum ShapeType {
 	Line,
 	Waveform
 	/*To be Implmeneted
-    Custom,
-    FullSongWaveForm
-    */
+	Custom,
+	FullSongWaveForm
+	*/
 }
 export enum WaveformOrientation {
 	Vertical,
@@ -211,8 +211,8 @@ export class AudioVisual {
 							this.#canvas_height / 2
 					})
 					/* TODO: IMPLEMENT SCALING TO BEAT
-                    this.injectingHTMLElement.parentElement.style.transform = `scale(${(100 + Math.max((frequencyData[2] * 2 + 130) / 5, 1)) / 100})`
-                    */
+					this.injectingHTMLElement.parentElement.style.transform = `scale(${(100 + Math.max((frequencyData[2] * 2 + 130) / 5, 1)) / 100})`
+					*/
 				}
 
 				break
@@ -296,10 +296,7 @@ export class AudioVisual {
 						for (let i = 0; i < arr.length; i++) {
 							path += `L ${arr[i].x.toFixed(2)},${arr[i].y.toFixed(2)} `
 						}
-						if (this.#shape.shape_type == ShapeType.Line) {
-							path += `L ${this.#canvas_width} ${this.#canvas_height} `
-							//path += `L ${canvas_width} ${canvas_height} `
-						}
+						path += `L ${this.#canvas_width} ${this.#canvas_height} `
 						break
 					}
 					case ShapeType.Circle: {
@@ -339,10 +336,10 @@ export class AudioVisual {
 
 			case SmoothingAlgorythm.BezierWeighted: {
 				/*THIS IS VERY MUCH BROKEN ATM :(
-                for (let i = 2; i < arr.length; i++) {
-                    const end = [arr.x[i], arr.y[i]] // the current point is the end of this segment of the curve
-                    path += `C ${startControl[0]} ${startControl[1]} ${endControl[0]} ${endControl[1]} ${end[0]} ${end[1]}`
-                }*/
+				for (let i = 2; i < arr.length; i++) {
+					const end = [arr.x[i], arr.y[i]] // the current point is the end of this segment of the curve
+					path += `C ${startControl[0]} ${startControl[1]} ${endControl[0]} ${endControl[1]} ${end[0]} ${end[1]}`
+				}*/
 				console.error("BezierWeighted not implemented yet...")
 				break
 			}
@@ -488,19 +485,19 @@ export class AudioVisualBuilder {
 		return this
 	}
 	/**
-     * Defines what the svg d attribute path command will use.
-     *
-     * `Linear` - Uses no interpolation between points, jagged but very fast
-     *
-     * `BezierPerpendicular` - Sets the Cubic Bézier anchors perpendicular to the point. Great for Line shapes with no curves.
-     *
-     * `CatmullRom` - Uses Centripetal Catmull–Rom spline under the hood, then translates them to Cubic Bézier points. Best quality, worst performance.
-     *
-     * `BezierWeighted` - DO NOT USE! It's broken at the moment :/. Sets the Cubic Bézier anchors halfway between the next and previous point. Better than Linear on Circular shapes and doesn't have the "invards bulding" side effect of Catmull Rom
+	 * Defines what the svg d attribute path command will use.
+	 *
+	 * `Linear` - Uses no interpolation between points, jagged but very fast
+	 *
+	 * `BezierPerpendicular` - Sets the Cubic Bézier anchors perpendicular to the point. Great for Line shapes with no curves.
+	 *
+	 * `CatmullRom` - Uses Centripetal Catmull–Rom spline under the hood, then translates them to Cubic Bézier points. Best quality, worst performance.
+	 *
+	 * `BezierWeighted` - DO NOT USE! It's broken at the moment :/. Sets the Cubic Bézier anchors halfway between the next and previous point. Better than Linear on Circular shapes and doesn't have the "invards bulding" side effect of Catmull Rom
 
-     * @param algorythm Linear = 0; BezierPerpendicular = 1; CatmullRom = 2; BezierWeighted = 3;
-     * @returns
-     */
+	 * @param algorythm Linear = 0; BezierPerpendicular = 1; CatmullRom = 2; BezierWeighted = 3;
+	 * @returns
+	 */
 	set_smoothing_algorythm(algorythm: SmoothingAlgorythm) {
 		this.#smoothing_algorythm = algorythm
 		return this

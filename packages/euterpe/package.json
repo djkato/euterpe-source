@@ -1,33 +1,33 @@
 {
-  "name": "@euterpe.js/euterpe",
-  "version": "2.0.1",
-  "type": "module",
-  "description": "Fully featured solution for playing music on the web. Support for local library, audio visuals and more!",
-  "main": "./src/index.js",
-  "author": {
-    "name": "Djkáťo",
-    "email": "djkatovfx@gmail.com"
-  },
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/euterpe-js/euterpe-source.git"
-  },
-  "homepage": "https://github.com/euterpe-js/euterpe-source/tree/master/packages/euterpe#readme",
-  "keywords": [
-    "audio",
-    "library",
-    "music-database",
-    "audio-player",
-    "webaudio",
-    "database",
-    "db"
-  ],
-  "exports": {
-    ".": {
-      "types": "./src/index.d.ts",
-      "import": "./src/index.js",
-      "require": "./src/lib/euterpe.js"
-    }
-  }
+	"name": "@euterpe.js/euterpe",
+	"version": "2.1.0",
+	"type": "module",
+	"description": "Fully featured solution for playing music on the web. Support for local library, audio visuals and more!",
+	"main": "./src/index.js",
+	"author": {
+		"name": "Djkáťo",
+		"email": "djkatovfx@gmail.com"
+	},
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/euterpe-js/euterpe-source.git"
+	},
+	"homepage": "https://github.com/euterpe-js/euterpe-source/tree/master/packages/euterpe#readme",
+	"keywords": [
+		"audio",
+		"library",
+		"music-database",
+		"audio-player",
+		"webaudio",
+		"database",
+		"db"
+	],
+	"exports": {
+		".": {
+			"types": "./src/index.d.ts",
+			"import": "./src/index.js",
+			"require": "./src/lib/euterpe.js"
+		}
+	}
 }

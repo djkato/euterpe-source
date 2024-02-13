@@ -118,7 +118,7 @@ export class MusicPlayer {
 		this.volume = this.gain.gain.value = volume_i
 	}
 	/**
-	 * Safer seek_async. Normal seek will try to start the player even if the track hasn't started yet, or was previously suspended/closed.
+	 * Safer seek. Normal seek will try to start the player even if the track hasn't started yet, or was previously suspended/closed.
 	 * will not resume playback
 	 * @throws if "Can't seek - Audiocontext is not running"
 	 */
@@ -131,14 +131,14 @@ export class MusicPlayer {
 	}
 
 	/**
-	 * Unsafe, throws error if failed. Use try_seek_async or seek_async unless you don't care about the result.
+	 * Unsafe, throws error if failed. Use try_seek or seek unless you don't care about the result.
 	 */
 	seek(new_time: number) {
 		this.audio_element.currentTime = new_time
 	}
 
 	/**
-	 * Safer play_toggle_async. Normal play_toggle will try to start the player even if the track hasn't started yet, or was previously suspended/closed
+	 * Safer play_toggle. Normal play_toggle will try to start the player even if the track hasn't started yet, or was previously suspended/closed
 	 * @throws Error if playback failed
 	 */
 	async try_play_toggle() {
@@ -196,7 +196,7 @@ export class MusicPlayer {
 	}
 
 	/**
-	 * Unsafe, can just fail. Use play_async or try_play_async unless you don't care about the result.
+	 * Unsafe, can just fail. Use play or try_play unless you don't care about the result.
 	 */
 	play() {
 		if (this.is_playing) return
@@ -214,7 +214,7 @@ export class MusicPlayer {
 	}
 
 	/**
-	 * Will only load metadata of the upcoming song. Need to call try_play_async() afterwards to start the playback
+	 * Will only load metadata of the upcoming song and change audio dom elements url. Need to call try_play() afterwards to start the playback
 	 * @throws Error if adding element throwed Error or Stalled
 	 */
 	async try_new_song(path: string) {
@@ -255,16 +255,17 @@ export class MusicPlayer {
 			)
 
 			//once aborted, try to set current_song_duration
-			controller.signal.addEventListener("abort", (r) => {
+			controller.signal.addEventListener("abort", () => {
 				this.current_song_duration = this.audio_element.duration
 				if (typeof controller.signal.reason == "string") reject(new Error(controller.signal.reason))
 				resolve()
 			})
+
 			this.is_playing = false
 		})
 	}
 	/**
-	 * Won't tell if you if the song actually got loaded or if it failed. For a safer version use try_new_song_async() unless you don't care about the result
+	 * Won't tell if you if the song actually got loaded or if it failed. For a safer version use try_new_song() unless you don't care about the result
 	 */
 	new_song(path: string) {
 		this.audio_element.src = this.current_song_path = path

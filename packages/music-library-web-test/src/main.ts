@@ -10,100 +10,109 @@ music_player.change_volume(1)
 let curr_song_id = 1
 const elem_curr_song = document.querySelector("#text-playing")
 
-music_player.try_new_song_async(db.songs[curr_song_id].url.pathname).then(
-	() => {
-		let is_seeking = false
-		change_current_song_text(db)
+let is_seeking = false
 
-		document.querySelector("#previous")?.addEventListener("click", () => {
-			curr_song_id--
-			if (curr_song_id < 0) curr_song_id = 2
-			music_player.try_new_song_async(db.songs[curr_song_id].url.pathname).then(
-				(s) => {
-					change_current_song_text(db)
-					music_player.play_async().catch((err) => {
-						console.log(err)
-					})
-				},
-				(e) => {
-					console.log(e)
-				}
-			)
-		})
-		document.querySelector("#next")?.addEventListener("click", () => {
-			curr_song_id++
-			if (curr_song_id > 2) curr_song_id = 0
-			music_player.try_new_song_async(db.songs[curr_song_id].url.pathname).then(
-				(s) => {
-					change_current_song_text(db)
-					music_player.play_async().catch((err) => {
-						console.log(err)
-					})
-				},
-				(e) => {
-					console.log(e)
-				}
-			)
-		})
+document.querySelector("#previous")?.addEventListener("click", () => {
+	curr_song_id--
+	if (curr_song_id < 0) curr_song_id = 2
+	music_player.try_new_song(db.songs[curr_song_id].url.pathname).then(
+		() => {
+			change_current_song_text(db)
+			music_player.try_play().catch((err) => {
+				console.log(err)
+			})
+		},
+		(e) => {
+			console.log(e)
+		}
+	)
+})
 
-		document.querySelector("#play")?.addEventListener("click", () => {
-			music_player.play_async().then(
-				() => {
-					console.log("Playing!")
-				},
-				(e) => alert("Failed to play, " + e)
-			)
-		})
-		document.querySelector("#pause")?.addEventListener("click", () => {
-			music_player.pause()
-		})
-		document.querySelector("#mute")?.addEventListener("click", () => {
-			music_player.mute()
-		})
-		document.querySelector("#unmute")?.addEventListener("click", () => {
-			music_player.unmute()
-		})
-		document.querySelector("#toggle-mute")?.addEventListener("click", () => {
-			music_player.mute_toggle()
-		})
-		document.querySelector("#toggle-play")?.addEventListener("click", () => {
-			music_player.play_toggle_async().then(
-				(s) => console.log("toggled play/pause"),
-				(e) => alert("failed to toggle pause/play!" + e)
-			)
-		})
-		document.querySelector("#volume")?.addEventListener("input", (e) => {
-			music_player.change_volume(e.target?.valueAsNumber)
-		})
-		document.querySelector("#seek")?.addEventListener("mousedown", (e) => {
-			is_seeking = true
-		})
-		document.querySelector("#seek")?.addEventListener("mouseup", (e) => {
-			music_player.try_seek_async(e.target?.valueAsNumber).then(
-				() => {
-					console.log("seeked to " + e.target?.valueAsNumber)
-				},
-				() => {
-					alert("Failed seeking! " + e)
-				}
-			)
-			is_seeking = false
-		})
-		// Subscriptions to AudioContext changes, eg. time..
-		music_player.subscribe_to_formatted_duration_time((time) => {
-			document.querySelector("#duration").innerHTML = time
-			document.querySelector("#seek").max = "" + music_player.get_current_duration()
-		})
-		music_player.subscribe_to_formatted_current_time_tick((time) => {
-			document.querySelector("#current").innerHTML = time
-		})
-		music_player.subscribe_to_time_tick((time) => {
-			if (is_seeking) return
-			document.querySelector("#seek").value = "" + time
-		})
-	},
-	(e) => console.log(e)
-)
+document.querySelector("#next")?.addEventListener("click", () => {
+	curr_song_id++
+	if (curr_song_id > 2) curr_song_id = 0
+	music_player.try_new_song(db.songs[curr_song_id].url.pathname).then(
+		() => {
+			change_current_song_text(db)
+			music_player.try_play().catch((err) => {
+				console.log(err)
+			})
+		},
+		(e) => {
+			console.log(e)
+		}
+	)
+})
+
+document.querySelector("#play")?.addEventListener("click", () => {
+	music_player.try_play().then(
+		() => {
+			console.log("Playing!")
+		},
+		(e) => alert("Failed to play, " + e)
+	)
+})
+
+document.querySelector("#pause")?.addEventListener("click", () => {
+	music_player.pause()
+})
+
+document.querySelector("#mute")?.addEventListener("click", () => {
+	music_player.mute()
+})
+
+document.querySelector("#unmute")?.addEventListener("click", () => {
+	music_player.unmute()
+})
+
+document.querySelector("#toggle-mute")?.addEventListener("click", () => {
+	music_player.mute_toggle()
+})
+
+document.querySelector("#toggle-play")?.addEventListener("click", () => {
+	music_player.try_play_toggle().then(
+		(s) => console.log("toggled play/pause"),
+		(e) => alert("failed to toggle pause/play!" + e)
+	)
+})
+
+document.querySelector("#volume")?.addEventListener("input", (e) => {
+	music_player.change_volume(e.target?.valueAsNumber)
+})
+
+document.querySelector("#seek")?.addEventListener("mousedown", (e) => {
+	is_seeking = true
+})
+
+document.querySelector("#seek")?.addEventListener("mouseup", (e) => {
+	music_player.try_seek(e.target?.valueAsNumber).then(
+		() => {
+			console.log("seeked to " + e.target?.valueAsNumber)
+		},
+		() => {
+			alert("Failed seeking! " + e)
+		}
+	)
+	is_seeking = false
+})
+
+// Subscriptions to AudioContext changes, eg. time..
+music_player.on_duration_formatted((time) => {
+	document.querySelector("#duration")!.innerHTML = time
+	document.querySelector("#seek")!.max = "" + music_player.current_song_duration
+})
+
+music_player.on_time_tick_formatted((time) => {
+	document.querySelector("#current")!.innerHTML = time
+})
+
+music_player.on_time_tick((time) => {
+	if (is_seeking) return
+	document.querySelector("#seek")!.value = "" + time
+})
+
+music_player.try_new_song(db.songs[curr_song_id].url.pathname).then(() => {})
+change_current_song_text(db)
 
 function change_current_song_text(db: DB) {
 	const curr_song = db.songs[curr_song_id]

@@ -10,6 +10,7 @@ class Euterpe extends MusicPlayer {
 	current_song_id = 0
 	queue: Song[] = []
 	played_history: Song[] = []
+	#sub_list: Array<(song_id: number, song_name: string) => void> = []
 	constructor(
 		public db: DB,
 		audio_context: AudioContext,
@@ -22,13 +23,32 @@ class Euterpe extends MusicPlayer {
 	) {
 		super(audio_context, audio_element, track, gain, volume, current_song_path)
 
-		audio_element.addEventListener("ended", () => {
-			audio_element.currentTime = 0
-			audio_element.pause()
+		audio_element.addEventListener("ended", async () => {
 			try {
-				this.try_next_song()
-			} catch (e) { }
+				await this.try_next_song()
+			} catch (e) {
+				audio_element.currentTime = 0
+				this.pause()
+			}
 		})
+	}
+
+	/**
+	 * Unsafe, throws error if failed. Use try_seek or seek unless you don't care about the result.
+	 */
+	override seek(new_time: number) {
+		super.seek(new_time)
+		if (this.options?.auto_play_after_seek) this.play()
+	}
+
+	/**
+	 * Safer seek. Normal seek will try to start the player even if the track hasn't started yet, or was previously suspended/closed.
+	 * won't resume playback by default unless `EuterpeBuilderOptions.auto_play_after_seek == true`
+	 * @throws if "Can't seek - Audiocontext is not running"
+	 */
+	override async try_seek(new_time: number) {
+		await super.try_seek(new_time)
+		if (this.options?.auto_play_after_seek) this.play()
 	}
 
 	/**
@@ -39,8 +59,9 @@ class Euterpe extends MusicPlayer {
 		const next = this.db.songs.find((song) => song!.id == id)
 		if (!next) throw new Error(`Song with id ${id} doesn't exist`)
 		else {
-			await this.try_new_song(next.url.pathname)
 			this.current_song = next
+			this.#emit_on_song_change()
+			await this.try_new_song(next.url.pathname)
 		}
 	}
 
@@ -63,10 +84,11 @@ class Euterpe extends MusicPlayer {
 		}
 		const url = this.options?.use_only_pathname_url ? new_song.url.pathname : new_song.url.toString()
 		await this.try_new_song(url)
-		await this.try_play()
+		if (this.options?.auto_play_after_changing_song) await this.try_play()
 		if (this.current_song) this.played_history.push(this.current_song)
 		this.current_song = new_song
 		this.current_song_id = new_song.id!
+		this.#emit_on_song_change()
 	}
 
 	/**
@@ -87,14 +109,15 @@ class Euterpe extends MusicPlayer {
 		}
 		const url = this.options?.use_only_pathname_url ? new_song.url.pathname : new_song.url.toString()
 		await this.try_new_song(url)
-		await this.try_play()
+		if (this.options?.auto_play_after_changing_song) await this.try_play()
 		if (this.current_song) this.played_history.push(this.current_song)
 		this.current_song = new_song
 		this.current_song_id = new_song.id!
+		this.#emit_on_song_change()
 	}
 
 	/**
-	 * Won't tell you if the playback was successsful & wil loop back if already on last song. Best use try_next_song_async()
+	 * Won't tell you if the playback was successsful & will loop back if already on last song. Best use try_next_song()
 	 * If queue present, uses that, if not, relies on Song ID directly from DB
 	 */
 	next_song_looping() {
@@ -111,14 +134,15 @@ class Euterpe extends MusicPlayer {
 		}
 		const url = this.options?.use_only_pathname_url ? new_song.url.pathname : new_song.url.toString()
 		this.new_song(url)
-		this.play()
+		if (this.options?.auto_play_after_changing_song) this.play()
 		if (this.current_song) this.played_history.push(this.current_song)
 		this.current_song = new_song
 		this.current_song_id = new_song.id!
+		this.#emit_on_song_change()
 	}
 
 	/**
-	 * Won't tell you if the playback was successsful, won't loop back if already on last song and won't throw error if attempted. Best use next_song_async()
+	 * Won't tell you if the playback was successsful, won't loop back if already on last song and won't throw error if attempted. Best use next_song()
 	 * If queue present, uses that, if not, relies on Song ID directly from DB
 	 */
 	next_song() {
@@ -133,39 +157,42 @@ class Euterpe extends MusicPlayer {
 		}
 		const url = this.options?.use_only_pathname_url ? new_song.url.pathname : new_song.url.toString()
 		this.new_song(url)
-		this.play()
+		if (this.options?.auto_play_after_changing_song) this.play()
 		if (this.current_song) this.played_history.push(this.current_song)
 		this.current_song = new_song
 		this.current_song_id = new_song.id!
+		this.#emit_on_song_change()
 	}
 
 	/**
-	 * Uses safer try_play_async. Normal play / play_async will try to start the player even if the track hasn't started yet, or was previously suspended/closed
+	 * Uses safer try_play. Normal play / play will try to start the player even if the track hasn't started yet, or was previously suspended/closed
 	 */
 	async try_specific_song(new_song_id: number) {
 		const new_song = this.db.songs.find((song) => song.id! == new_song_id)
 		if (!new_song) throw new Error(`No song with id "${new_song_id}" found`)
 		else {
 			this.try_new_song(new_song.url.pathname)
-			await this.try_play()
+			if (this.options?.auto_play_after_changing_song) await this.try_play()
 			if (this.current_song) this.played_history.push(this.current_song)
 			this.current_song = new_song
 			this.current_song_id = new_song.id!
+			this.#emit_on_song_change()
 		}
 	}
 
 	/**
-	 * Won't throw an error if new ID not found. Won't  tell you if the play was successful, best use specific_song_async() or try_specific_song_async()
+	 * Won't throw an error if new ID not found. Won't  tell you if the play was successful, best use specific_song() or try_specific_song()
 	 */
 	specific_song(new_song_id: number) {
 		const new_song = this.db.songs.find((song) => song.id! == new_song_id)
 		if (!new_song) return
 		const url = this.options?.use_only_pathname_url ? new_song.url.pathname : new_song.url.toString()
 		this.new_song(url)
-		this.play()
+		if (this.options?.auto_play_after_changing_song) this.play()
 		if (this.current_song) this.played_history.push(this.current_song)
 		this.current_song = new_song
 		this.current_song_id = new_song.id!
+		this.#emit_on_song_change()
 	}
 
 	/**
@@ -187,10 +214,10 @@ class Euterpe extends MusicPlayer {
 		}
 		const url = this.options?.use_only_pathname_url ? new_song.url.pathname : new_song.url.toString()
 		await this.try_new_song(url)
-		await this.try_play()
-		//if (this.current_song) this.played_history.push(this.current_song)
+		if (this.options?.auto_play_after_changing_song) await this.try_play()
 		this.current_song = new_song
 		this.current_song_id = new_song.id!
+		this.#emit_on_song_change()
 	}
 
 	/**
@@ -211,10 +238,10 @@ class Euterpe extends MusicPlayer {
 		}
 		const url = this.options?.use_only_pathname_url ? new_song.url.pathname : new_song.url.toString()
 		await this.try_new_song(url)
-		await this.try_play()
-		//if (this.current_song) this.played_history.push(this.current_song)
+		if (this.options?.auto_play_after_changing_song) await this.try_play()
 		this.current_song = new_song
 		this.current_song_id = new_song.id!
+		this.#emit_on_song_change()
 	}
 
 	/**
@@ -235,9 +262,9 @@ class Euterpe extends MusicPlayer {
 		}
 		const url = this.options?.use_only_pathname_url ? new_song.url.pathname : new_song.url.toString()
 		this.new_song(url)
-		this.play()
-		//if (this.current_song) this.played_history.push(this.current_song)
+		if (this.options?.auto_play_after_changing_song) this.play()
 		this.current_song_id = new_song.id!
+		this.#emit_on_song_change()
 		this.current_song = new_song
 	}
 
@@ -259,10 +286,10 @@ class Euterpe extends MusicPlayer {
 		}
 		const url = this.options?.use_only_pathname_url ? new_song.url.pathname : new_song.url.toString()
 		this.new_song(url)
-		this.play()
-		//if (this.current_song) this.played_history.push(this.current_song)
+		if (this.options?.auto_play_after_changing_song) this.play()
 		this.current_song_id = new_song.id!
 		this.current_song = new_song
+		this.#emit_on_song_change()
 	}
 
 	/**
@@ -350,9 +377,21 @@ class Euterpe extends MusicPlayer {
 		if (i == -1) return
 		return this.queue.splice(i, 1)
 	}
+
+	on_song_change(callback: (song_id: number, song_name: string) => void) {
+		this.#sub_list.push(callback)
+	}
+
+	#emit_on_song_change() {
+		for (const func of this.#sub_list) {
+			func(this.current_song_id, this.format_current_song(this.current_song_id))
+		}
+	}
 }
 type BuilderOptions = {
 	use_only_pathname_url?: boolean
+	auto_play_after_seek?: boolean
+	auto_play_after_changing_song?: boolean
 }
 
 class EuterpeBuilder {
