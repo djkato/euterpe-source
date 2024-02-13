@@ -62,17 +62,17 @@ let curr_song_id = 1;
 document.querySelector("#previous")?.addEventListener("click", () => {
     curr_song_id--
     if (curr_song_id < 0) curr_song_id = 2
-    music_player.try_new_song_async(db.songs[curr_song_id].url.pathname).then((s) => {
+    music_player.try_new_song(db.songs[curr_song_id].url.pathname).then((s) => {
         change_current_song_text(db)
-        music_player.play_async().catch((err) => { console.log(err) })
+        music_player.try_play().catch((err) => { console.log(err) })
     }, (e) => { console.log(e) })
 })
 document.querySelector("#next")?.addEventListener("click", () => {
     curr_song_id++
     if (curr_song_id > 2) curr_song_id = 0
-    music_player.try_new_song_async(db.songs[curr_song_id].url.pathname).then((s) => {
+    music_player.try_new_song(db.songs[curr_song_id].url.pathname).then((s) => {
         change_current_song_text(db)
-        music_player.play_async().catch((err) => { console.log(err) })
+        music_player.try_play().catch((err) => { console.log(err) })
     }, (e) => { console.log(e) })
 })
 ```

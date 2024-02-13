@@ -31,9 +31,9 @@ body {
 }
 .waveform-time {
     clip-path: var(--clip-time-path);
-    fill: rgba(50,145,200,0.3);
+    fill: rgba(0,255,50,0.5);
 }
 .waveform-seek {
     clip-path: var(--clip-seek-path);
-    fill: rgba(50,145,200,0.3);
+    fill: rgba(0,50,255,0.5);
 }

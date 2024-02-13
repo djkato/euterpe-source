@@ -1,1 +1,1 @@
-import { MusicPlayerBuilder } from "@euterpe.js/player";
+import { MusicPlayerBuilder } from "@euterpe.js/player"
