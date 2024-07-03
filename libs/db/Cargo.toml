@@ -1,0 +1,19 @@
+[package]
+name = "euterpe_db"
+version = "0.1.0"
+edition = "2021"
+authors = ["Djkáťo <djkatovfx@gmail.com>"]
+description = "Fully featured web player"
+homepage = "https://github.com/euterpe/euterpe-source"
+repository = "https://github.com/euterpe/euterpe-source"
+documentation = "https://github.com/euterpe/euterpe-source"
+# keywords = ["player", "web"]
+# categories = ["web-programming::http-server"]
+
+[dependencies]
+thiserror.workspace = true
+wasm-bindgen.workspace = true
+
+[dependencies.web-sys]
+workspace = true
+features = []

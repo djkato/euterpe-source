@@ -51,3 +51,7 @@ Thumbs.db
 *.jpeg
 *.jpg
 *.exr
+
+# Added by cargo
+
+/target

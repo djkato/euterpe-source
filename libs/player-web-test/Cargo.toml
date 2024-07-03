@@ -1,0 +1,2 @@
+[dependencies]
+euterpe_player = { path = "player", version = "*" }

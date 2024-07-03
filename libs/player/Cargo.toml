@@ -1,0 +1,36 @@
+[package]
+name = "euterpe_player"
+version = "0.1.0"
+edition = "2021"
+authors = ["Djkáťo <djkatovfx@gmail.com>"]
+description = "Fully featured web player"
+homepage = "https://github.com/euterpe/euterpe-source"
+repository = "https://github.com/euterpe/euterpe-source"
+documentation = "https://github.com/euterpe/euterpe-source"
+# keywords = ["player", "web"]
+# categories = ["web-programming::http-server"]
+
+[dependencies]
+thiserror.workspace = true
+wasm-bindgen.workspace = true
+futures-signals = "0.3.33"
+wasm-bindgen-futures = "0.4.42"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies.web-sys]
+features = [
+  "AudioContext",
+  "AbortController",
+  "Event",
+  "MediaElementAudioSourceNode",
+  "AnalyserNode",
+  "AudioDestinationNode",
+  "AudioContextState",
+  "HtmlAudioElement",
+  "BaseAudioContext",
+  "GainNode",
+  "AudioParam",
+]
+workspace = true
